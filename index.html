@@ -1,1169 +1,255 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Vitae Romanorum · Atlante temporale 70 a.C. – 400 d.C.</title>
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="9" fill="%23eaa6c4"/></svg>'>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Imperatori & Scrittori Romani</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--ink);font-family:'Fraunces',Georgia,serif}
-button{font-family:inherit}
-
-/* ============ TEMA: notte (default) e pergamena ============ */
-:root{
- --bg:#14100c; --map-bg:#100d0a;
- --ink:#efe6d8; --ink-soft:#cfc4b2; --ink-dim:#a3947f; --ink-faint:#8a7d6c; --ink-muted:#6f6355;
- --panel:rgba(20,16,12,.82); --panel-line:rgba(239,230,216,.13);
- --line:rgba(239,230,216,.14); --line-strong:rgba(239,230,216,.16); --hover-line:rgba(239,230,216,.4);
- --accent:#efe6d8; --accent-ink:#14100c;
- --bar:rgba(18,14,11,.9);
- --chip-bg:rgba(239,230,216,.04); --chip-bg-strong:rgba(239,230,216,.13);
- --grid:rgba(239,230,216,.07); --fog:rgba(10,8,6,.5);
- --glow:rgba(239,230,216,.35);
- --tip-bg:#221c16; --card-head:#1b1610;
- --ctrl-bg:#1d1813; --ctrl-bg-h:#2a221b; --attr-bg:rgba(22,18,14,.6);
- --mk-ink:#f4ecdd; --mk-bg:rgba(20,16,12,.6); --mk-bg-h:rgba(33,26,20,.9);
- --dot-ring:rgba(16,13,10,.95); --dot-inner:rgba(22,18,14,.55);
- --mk-ts:0 1px 3px rgba(0,0,0,.8);
- --vig:rgba(6,4,3,.65); --grain-op:.05;
- --tile-filter:grayscale(.28) sepia(.14) brightness(.92) saturate(.9);
- --c-imp:#eaa6c4; --c-poet:#a9d6ab; --c-lit:#ecc78f;
- --ev-imp:#efb9d0; --ev-poet:#bcdfbe; --ev-lit:#efd3a4;
- --intro-stroke:rgba(239,230,216,.06);
- --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(20,16,12,.42) 0%,rgba(20,16,12,.78) 70%,rgba(20,16,12,.94) 100%);
- --intro-ts:0 2px 22px rgba(0,0,0,.55);
- --chap-ts:0 2px 24px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.55);
-}
-:root.light{
- --bg:#ece2cd; --map-bg:#e6dcc6;
- --ink:#33281c; --ink-soft:#4a3b2a; --ink-dim:#7a6a52; --ink-faint:#93826a; --ink-muted:#8a7a63;
- --panel:rgba(244,236,221,.86); --panel-line:rgba(58,47,34,.16);
- --line:rgba(58,47,34,.17); --line-strong:rgba(58,47,34,.26); --hover-line:rgba(58,47,34,.5);
- --accent:#3a2f22; --accent-ink:#efe6d4;
- --bar:rgba(240,231,214,.92);
- --chip-bg:rgba(58,47,34,.05); --chip-bg-strong:rgba(58,47,34,.12);
- --grid:rgba(58,47,34,.12); --fog:rgba(236,226,205,.62);
- --glow:rgba(58,47,34,.22);
- --tip-bg:#f4ecda; --card-head:#efe7d3;
- --ctrl-bg:#f0e8d5; --ctrl-bg-h:#e3d9c1; --attr-bg:rgba(240,231,214,.75);
- --mk-ink:#33281c; --mk-bg:rgba(246,238,224,.82); --mk-bg-h:rgba(250,244,232,.96);
- --dot-ring:rgba(246,238,224,.92); --dot-inner:rgba(246,238,224,.72);
- --mk-ts:0 0 0 rgba(0,0,0,0);
- --vig:rgba(122,96,62,.18); --grain-op:.04;
- --tile-filter:sepia(.42) saturate(.72) brightness(1.03) contrast(.96);
- --c-imp:#b25d84; --c-poet:#4e8a52; --c-lit:#b3822f;
- --ev-imp:#a5456e; --ev-poet:#3f7a44; --ev-lit:#8a6220;
- --intro-stroke:rgba(58,47,34,.09);
- --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(243,235,219,.48) 0%,rgba(243,235,219,.84) 70%,rgba(243,235,219,.96) 100%);
- --intro-ts:0 2px 22px rgba(90,72,48,.35);
- --chap-ts:0 0 0 rgba(0,0,0,0);
-}
-
-/* ============ mappa ============ */
-#map{position:fixed;inset:0;z-index:0;background:var(--map-bg)}
-.leaflet-container{background:var(--map-bg);font:inherit}
-.leaflet-tile{filter:var(--tile-filter)}
-#vignette{position:fixed;inset:0;pointer-events:none;z-index:4;box-shadow:inset 0 0 190px var(--vig)}
-#grain{position:fixed;inset:0;pointer-events:none;z-index:300;opacity:var(--grain-op);mix-blend-mode:overlay;
- background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-/* ============ categorie pastello ============ */
-.cat-imp{--c:var(--c-imp)}.cat-poet{--c:var(--c-poet)}.cat-lit{--c:var(--c-lit)}
-
-/* ============ pannelli base ============ */
-.panel{background:var(--panel);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);
- border:1px solid var(--panel-line);border-radius:10px}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}::-webkit-scrollbar-track{background:transparent}
-
-/* ============ header ============ */
-#hdr{position:fixed;top:18px;left:22px;z-index:20}
-.kicker{font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.24em;color:var(--ink-dim);text-transform:uppercase}
-#hdr h1{font-weight:600;font-style:italic;font-size:30px;line-height:1.1;margin-top:7px;letter-spacing:.01em}
-#hdr .sub{font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-faint);margin-top:5px;letter-spacing:.05em}
-
-/* ============ anno + era ============ */
-#yearBox{position:fixed;top:12px;right:24px;z-index:20;text-align:right;user-select:none}
-#yearBox .big{line-height:.95}
-#yNum{font-weight:900;font-size:66px;display:inline-block}
-#yNum.tick{animation:yTick .5s ease}
-@keyframes yTick{30%{transform:scale(1.12)}}
-#yEra{font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--ink-dim);margin-left:7px;vertical-align:8px}
-#eraName{font-style:italic;font-weight:300;font-size:16px;color:var(--ink-soft);margin-top:5px}
-.swap{animation:eraswap .65s ease both}
-@keyframes eraswap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
-
-/* ============ colonna sinistra ============ */
-#left{position:fixed;left:22px;top:128px;z-index:20;width:252px;padding:14px;display:flex;flex-direction:column;gap:14px;
- max-height:calc(100vh - 292px);overflow-y:auto}
-#left>div+div{border-top:1px solid var(--panel-line);padding-top:13px}
-.mini-lbl{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.24em;color:var(--ink-faint);margin-bottom:8px}
-.flt{display:flex;flex-direction:column;gap:6px}
-.flt button{display:flex;align-items:center;gap:9px;background:none;border:1px solid var(--line);
- border-radius:7px;padding:6px 10px;color:var(--ink);font:500 11px 'IBM Plex Mono',monospace;cursor:pointer;transition:.2s;text-align:left}
-.flt button:hover{border-color:var(--hover-line)}
-.flt button.off{opacity:.35}
-.fdot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
-.flt .cnt{margin-left:auto;color:var(--ink-faint)}
-#aliveHead{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
-#aliveNum{font:600 24px 'Fraunces';color:var(--ink)}
-#aliveHead .t{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--ink-faint)}
-#aliveList{display:flex;flex-wrap:wrap;gap:5px;max-height:150px;overflow-y:auto;padding-right:4px}
-.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);
- background:var(--chip-bg);border-radius:999px;padding:3px 10px 3px 7px;
- font:500 11px 'IBM Plex Mono',monospace;color:var(--ink);cursor:pointer;transition:.15s}
-.chip:hover{border-color:var(--c)}
-.chip .cd{width:6px;height:6px;border-radius:50%;background:var(--c)}
-.none{font-style:italic;font-weight:300;color:var(--ink-faint);font-size:13px}
-
-/* blocco era */
-#eraBlock .e-name{font:italic 600 17px 'Fraunces';line-height:1.18}
-#eraBlock .e-range{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--ink-faint);margin-top:4px;text-transform:uppercase}
-#eraBlock .e-txt{font:300 12.5px/1.55 'Fraunces';color:var(--ink-soft);margin-top:8px}
-
-/* ============ chronica ============ */
-#right{position:fixed;right:24px;top:152px;bottom:160px;width:302px;z-index:20;display:flex;flex-direction:column;padding:14px 14px 8px}
-.panel-title{font:600 10px 'IBM Plex Mono',monospace;letter-spacing:.26em;color:var(--ink-faint);
- padding-bottom:10px;border-bottom:1px solid var(--panel-line);display:flex;justify-content:space-between;align-items:baseline}
-.panel-title .cnt{letter-spacing:.05em}
-#feed{flex:1;overflow-y:auto;padding-top:8px;display:flex;flex-direction:column;gap:1px}
-.ev{display:flex;align-items:baseline;gap:8px;padding:6px 6px;border:none;background:none;color:var(--ink-soft);
- font:400 12.5px 'Fraunces';text-align:left;cursor:pointer;width:100%;border-radius:6px;transition:background .15s}
-.ev:hover{background:var(--chip-bg)}
-.ev b{font-weight:600}
-.ev .ev-i{flex:none;font:500 11px 'IBM Plex Mono',monospace;align-self:center}
-.ev .ev-i.b{width:8px;height:8px;border-radius:50%}
-.ev .ev-i.d{color:var(--ink-faint)}
-.ev i{font-style:italic;color:var(--ink-dim)}
-.ev .ev-y{margin-left:auto;flex:none;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-faint)}
-.ev[data-cat=imp] b{color:var(--ev-imp)}.ev[data-cat=poet] b{color:var(--ev-poet)}.ev[data-cat=lit] b{color:var(--ev-lit)}
-.ev[data-cat=imp] .ev-i.b{background:var(--c-imp)}.ev[data-cat=poet] .ev-i.b{background:var(--c-poet)}.ev[data-cat=lit] .ev-i.b{background:var(--c-lit)}
-.ev.new{animation:evin .5s cubic-bezier(.2,1,.3,1) both}
-@keyframes evin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
-
-/* ============ scheda persona ============ */
-#card{position:fixed;right:24px;top:152px;bottom:160px;width:302px;z-index:21;display:none;flex-direction:column;overflow-y:auto;padding:0 16px 14px}
-#card.open{display:flex}
-.card-head{position:sticky;top:0;z-index:2;background:var(--card-head);margin:0 -16px;padding:12px 16px 10px;
- border-bottom:1px solid var(--panel-line);display:flex;align-items:center}
-.card-cat{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.26em}
-.card-x{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);
- background:none;color:var(--ink-dim);cursor:pointer;display:grid;place-items:center;transition:.15s;flex:none}
-.card-x:hover{color:var(--ink);border-color:var(--hover-line)}
-.card-name{font:italic 600 30px 'Fraunces';line-height:1.05;margin:10px 0 6px}
-.st{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.08em}
-.st.dim{color:var(--ink-faint);font-style:italic;font-family:'Fraunces';font-weight:300;font-size:13px;letter-spacing:0}
-.st .stdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px;animation:pulse 2.6s ease-out infinite}
-@keyframes pulse{0%{transform:scale(.8);opacity:.7}70%,100%{transform:scale(2.1);opacity:0}}
-.card-age{font:italic 300 13px 'Fraunces';color:var(--ink-dim);margin-top:4px}
-.c-block{margin-top:15px;padding-top:12px;border-top:1px solid var(--panel-line)}
-.c-lbl{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.22em;color:var(--ink-faint);display:block;margin-bottom:5px}
-.c-loc{font-size:16px;font-weight:500}
-.c-yr{font:400 12px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
-.gmlink{display:inline-flex;align-items:center;gap:5px;font:500 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);
- text-decoration:none;border:1px solid var(--line);padding:4px 9px;border-radius:999px;margin-top:9px;transition:.15s}
-.gmlink:hover{color:var(--ink);border-color:var(--hover-line)}
-.lf{width:100%;cursor:pointer;margin-top:2px}
-.lf-track{stroke:var(--line-strong);stroke-width:1.5}
-.lf-txt{font:600 8.5px 'IBM Plex Mono',monospace;fill:var(--ink)}
-.lf-cur{stroke:var(--ink)}
-.lf-hint{font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-muted);margin-top:4px;letter-spacing:.04em}
-
-/* ============ titolo di capitolo ============ */
-#chap{position:fixed;left:0;right:0;top:33%;z-index:25;text-align:center;pointer-events:none;opacity:0}
-#chap.show{animation:chap 3.4s ease both}
-@keyframes chap{0%{opacity:0;transform:translateY(16px)}12%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0}}
-#chap .k{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.4em;color:var(--ink-dim)}
-#chap .n{font:italic 600 clamp(30px,4.6vw,54px)/1.1 'Fraunces';margin:12px 0 10px;text-shadow:var(--chap-ts)}
-#chap .r{font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.22em;color:var(--ink-dim)}
-#chap .rule{width:64px;height:1px;background:var(--ink-dim);margin:16px auto 0;position:relative;opacity:.8}
-#chap .rule::after{content:'';position:absolute;left:50%;top:-3px;width:7px;height:7px;background:var(--accent);transform:translateX(-50%) rotate(45deg)}
-
-/* ============ barra inferiore ============ */
-#bottom{position:fixed;left:0;right:0;bottom:0;height:132px;z-index:30;display:flex;gap:16px;
- padding:0 18px;background:var(--bar);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
- border-top:1px solid var(--panel-line)}
-.controls{display:flex;flex-direction:column;justify-content:center;gap:9px;flex:none;width:158px}
-.c-row{display:flex;gap:6px;align-items:center}
-#playBtn{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:var(--accent-ink);
- display:grid;place-items:center;cursor:pointer;transition:transform .2s;flex:none}
-#playBtn:hover{transform:scale(1.07)}
-.icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:none;
- color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;transition:.15s;flex:none}
-.icon-btn:hover{border-color:var(--hover-line);color:var(--ink)}
-.icon-btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.speed{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;width:max-content}
-.speed button{background:none;border:none;color:var(--ink-dim);font:500 10px 'IBM Plex Mono',monospace;padding:5px 10px;cursor:pointer;transition:.15s}
-.speed button.on{background:var(--chip-bg-strong);color:var(--ink)}
-.kbd-hint{font:400 8.5px/1.6 'IBM Plex Mono',monospace;color:var(--ink-muted);letter-spacing:.04em}
-
-.tl{flex:1;position:relative;margin:12px 0 14px;cursor:ew-resize;touch-action:none;user-select:none}
-.tl-head{position:relative;height:16px;font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-faint);pointer-events:none}
-.tl-head span{position:absolute;top:1px;transform:translateX(-50%)}
-.tl-head span.end{transform:translateX(-100%)}
-#cursLbl{position:absolute;top:0;transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);
- font:600 9px/1 'IBM Plex Mono',monospace;padding:3px 6px;border-radius:4px;white-space:nowrap}
-#cursLbl.r{transform:translateX(-100%)}
-#cursLbl.l{transform:none}
-#tlsvg{position:absolute;left:0;right:0;top:16px;bottom:0;width:100%;height:calc(100% - 16px)}
-#tlsvg .grid{stroke:var(--grid);stroke-width:1}
-#tlsvg g{cursor:pointer;transition:opacity .25s}
-#tlsvg.dim g{opacity:.13}
-#tlsvg.dim g:hover{opacity:1}
-#tlsvg .fog{fill:var(--fog);pointer-events:none}
-#tlcursor{position:absolute;top:10px;bottom:0;width:1px;background:var(--accent);
- pointer-events:none;box-shadow:0 0 9px var(--glow)}
-#tlcursor::after{content:'';position:absolute;top:0;left:-3.5px;width:8px;height:8px;background:var(--accent);transform:rotate(45deg)}
-
-/* ============ tooltip + toast ============ */
-#tip{position:fixed;z-index:60;pointer-events:none;display:none;background:var(--tip-bg);
- border:1px solid var(--panel-line);padding:8px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-#tip b{display:block;font:italic 600 15px 'Fraunces'}
-#tip span{font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
-#toast{position:fixed;left:50%;bottom:152px;transform:translateX(-50%) translateY(10px);z-index:90;
- background:var(--tip-bg);border:1px solid var(--panel-line);color:var(--ink-soft);
- font:400 11px/1.4 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:9px 16px;border-radius:999px;
- opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;
- white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ============ marker ============ */
-.mkhost{background:none;border:none;cursor:pointer}
-.mkhost:hover{z-index:1000}
-.mk{position:absolute;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%)}
-.mk.flip{flex-direction:row-reverse;transform:translate(-100%,-50%)}
-.mk-in{display:flex;align-items:center;gap:6px}
-.mk-dot{position:relative;width:13px;height:13px;border-radius:50%;background:var(--c);flex:none;
- box-shadow:0 0 0 2px var(--dot-ring),0 2px 8px rgba(0,0,0,.45);margin-left:-6.5px;transition:transform .2s}
-.mk.flip .mk-dot{margin-left:0;margin-right:-6.5px}
-.cat-imp .mk-dot{width:15px;height:15px;margin-left:-7.5px}
-.mk.flip.cat-imp .mk-dot{margin-left:0;margin-right:-7.5px}
-.mk-dot::before{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--dot-inner)}
-.mk-dot::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:1.5px solid var(--c);
- opacity:0;animation:pl 3.4s ease-out infinite;animation-delay:var(--pd,0s)}
-@keyframes pl{0%{transform:scale(.8);opacity:0}12%{opacity:.5}60%,100%{transform:scale(2.4);opacity:0}}
-.mk:hover .mk-dot{transform:scale(1.28)}
-.mk-name{font:600 13.5px 'Fraunces';color:var(--mk-ink);letter-spacing:.01em;background:var(--mk-bg);
- backdrop-filter:blur(3px);padding:2px 9px;border-radius:999px;
- border:1px solid var(--c);border-color:color-mix(in srgb,var(--c) 50%,transparent);
- text-shadow:var(--mk-ts);transition:.2s}
-.mk:hover .mk-name{background:var(--mk-bg-h);border-color:var(--c)}
-.mk.birth .mk-in{animation:mkb .85s cubic-bezier(.18,1.6,.35,1) both}
-@keyframes mkb{0%{transform:scale(0) rotate(-12deg);opacity:0}55%{transform:scale(1.22) rotate(3deg);opacity:1}100%{transform:scale(1) rotate(0)}}
-.mk.fadein .mk-in{animation:mkfi .5s ease both}
-@keyframes mkfi{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
-.mk.dying .mk-in{animation:mkd .72s cubic-bezier(.5,-.1,.7,.5) both}
-@keyframes mkd{28%{transform:scale(1.14);opacity:1}100%{transform:scale(0) rotate(26deg);opacity:0}}
-.mk.fadeout .mk-in{animation:mkfo .3s ease both}
-@keyframes mkfo{to{opacity:0;transform:scale(.6)}}
-
-/* ============ effetti nascita / morte ============ */
-.rip{position:absolute;left:50%;top:50%;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;
- border:2px solid var(--c);opacity:0;pointer-events:none;animation:rip 1.15s cubic-bezier(.2,.7,.3,1) forwards}
-@keyframes rip{0%{transform:scale(.35);opacity:.95}100%{transform:scale(6);opacity:0}}
-.rip.big{border-width:2.5px;animation-name:ripb}
-@keyframes ripb{0%{transform:scale(.35);opacity:.95}100%{transform:scale(9.5);opacity:0}}
-.spark{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;
- background:var(--c);pointer-events:none;animation:spk .8s cubic-bezier(.2,.7,.4,1) forwards}
-@keyframes spk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
-.cross{position:absolute;left:50%;top:50%;font:600 15px 'Fraunces';color:var(--ink);
- text-shadow:0 1px 6px #000;pointer-events:none;animation:rise 1.25s ease-out forwards}
-@keyframes rise{0%{opacity:0;transform:translate(-50%,-40%)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,calc(-50% - 44px))}}
-.dxcross{position:absolute;transform:translate(-50%,-50%);font:600 22px 'Fraunces';
- text-shadow:0 1px 8px #000,0 0 2px #000;pointer-events:none;animation:dxp 1.6s ease forwards}
-@keyframes dxp{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}32%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-75%)}}
-.comet{position:absolute;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#fff6e8;
- box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 55%,transparent),0 0 14px 3px var(--c);
- pointer-events:none;animation:cpulse .45s ease-in-out infinite alternate}
-@keyframes cpulse{from{transform:scale(.85)}to{transform:scale(1.25)}}
-
-/* ============ controlli leaflet ============ */
-.leaflet-bottom.leaflet-left{bottom:146px;left:16px}
-.leaflet-bottom.leaflet-right{bottom:139px;right:12px}
-.leaflet-bar{border:1px solid var(--line)!important;box-shadow:none!important;border-radius:7px;overflow:hidden}
-.leaflet-bar a{background:var(--ctrl-bg)!important;color:var(--ink-soft)!important;border-bottom:1px solid var(--line)!important}
-.leaflet-bar a:hover{background:var(--ctrl-bg-h)!important;color:var(--ink)!important}
-.leaflet-control-attribution{background:var(--attr-bg)!important;color:var(--ink-muted)!important;
- font:400 10px 'IBM Plex Mono',monospace!important;border-radius:4px}
-.leaflet-control-attribution a{color:var(--ink-dim)!important}
-.leaflet-control-scale-line{background:var(--attr-bg)!important;color:var(--ink-dim)!important;
- border:1px solid var(--line-strong)!important;border-top:none!important;font:400 9px 'IBM Plex Mono',monospace!important}
-
-/* ============ intro di vetro: la mappa si vede sotto ============ */
-#intro{position:fixed;inset:0;z-index:2000;background:var(--intro-glass);
- backdrop-filter:blur(6px) saturate(.85);-webkit-backdrop-filter:blur(6px) saturate(.85);
- display:grid;place-items:center;text-align:center;transition:opacity .85s ease;overflow:hidden}
-#intro.hide{opacity:0;pointer-events:none}
-.intro-bg{position:absolute;inset:0;display:grid;place-items:center;font:900 30vw 'Fraunces';
- color:transparent;-webkit-text-stroke:1px var(--intro-stroke);user-select:none;pointer-events:none}
-.intro-inner{position:relative;max-width:680px;padding:24px}
-.intro-inner>*{animation:inup .8s cubic-bezier(.2,.8,.2,1) both}
-.intro-inner .kicker{animation-delay:.05s}
-.intro-inner h1{animation-delay:.12s}.intro-inner p{animation-delay:.26s}
-.intro-legend{animation-delay:.42s}.intro-btns{animation-delay:.56s}.intro-hint{animation-delay:.72s}
-@keyframes inup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-.intro-title{font:italic 600 clamp(52px,9vw,104px)/0.95 'Fraunces';margin:20px 0 24px;text-shadow:var(--intro-ts)}
-.intro-inner p{font-weight:300;font-size:17px;line-height:1.65;color:var(--ink-soft);text-shadow:var(--intro-ts)}
-.intro-inner .kicker,.intro-legend,.intro-hint{text-shadow:var(--intro-ts)}
-.intro-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:26px 0 32px;
- font:500 11px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
-.intro-legend .fdot{width:10px;height:10px}
-.intro-legend span{display:inline-flex;align-items:center;gap:8px}
-.intro-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn{font:600 11px 'IBM Plex Mono',monospace;letter-spacing:.16em;text-transform:uppercase;padding:14px 28px;
- border-radius:999px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);transition:.25s}
-.btn:hover{background:transparent;color:var(--accent)}
-.btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--line)}
-.btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
-.intro-hint{margin-top:36px;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);letter-spacing:.1em}
-
-/* ============ modalità "solo mappa" ============ */
-#hdr,#left,#right{transition:opacity .5s ease,transform .5s ease}
-body.theater #hdr{opacity:0;transform:translateY(-16px);pointer-events:none;visibility:hidden;
- transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
-body.theater #left{opacity:0;transform:translateX(-20px);pointer-events:none;visibility:hidden;
- transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
-body.theater #right{opacity:0;transform:translateX(20px);pointer-events:none;visibility:hidden;
- transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
-body.theater #card{opacity:0;pointer-events:none}
-
-/* ============ responsive ============ */
-@media(max-width:1020px){
- #right{display:none!important}
- #left{width:206px;top:118px}
- #hdr h1{font-size:22px}
- #yNum{font-size:44px}
- .kbd-hint{display:none}
- #aliveList{max-height:88px}
- #card{left:12px;right:12px;width:auto;top:auto;bottom:150px;max-height:48vh}
-}
-@media(max-width:640px){
- #bottom{height:104px}
- .controls{width:auto}
- #left{display:none}
- #eraName{font-size:13px}
- .leaflet-bottom.leaflet-left{bottom:118px}
- #toast{bottom:120px}
-}
+body{font-family:Georgia,serif;background:#2a1f14;color:#3D2B1F;overflow:hidden;height:100vh;width:100vw}
+#app{position:relative;width:100%;height:100%}
+#mapCanvas{position:absolute;top:0;left:0;width:100%;height:100%;cursor:crosshair;background:#F5E6C8}
+.title-overlay{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:10;text-align:center;pointer-events:none;background:rgba(245,230,200,0.92);border:2px solid #C4A882;border-radius:12px;padding:10px 24px;box-shadow:0 4px 16px rgba(61,43,31,0.2)}
+.title-overlay h1{font-size:20px;font-weight:600;letter-spacing:1px}
+.title-overlay p{font-size:13px;color:#6B5344;margin-top:2px}
+.controls{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);z-index:10;background:linear-gradient(180deg,#FFF8E7 0%,#F5E6C8 100%);border:2px solid #C4A882;border-radius:14px;padding:12px 20px;box-shadow:0 8px 32px rgba(61,43,31,0.25),inset 0 1px 0 rgba(255,255,255,0.4);display:flex;flex-direction:column;gap:10px;min-width:480px;max-width:92vw}
+.timeline-row{display:flex;align-items:center;gap:14px}
+#playBtn{width:40px;height:40px;border-radius:50%;border:2px solid #C4A882;background:#FFF8E7;color:#3D2B1F;font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(61,43,31,0.15)}
+#playBtn:hover{background:#E8D5A3;transform:scale(1.08)}
+#playBtn:active{transform:scale(0.95)}
+#yearSlider{flex:1;-webkit-appearance:none;appearance:none;height:8px;border-radius:4px;background:linear-gradient(90deg,#C4A882,#E8D5A3);outline:none}
+#yearSlider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#3D2B1F;border:3px solid #FFF8E7;cursor:pointer;box-shadow:0 2px 8px rgba(61,43,31,0.3)}
+#yearSlider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#3D2B1F;border:3px solid #FFF8E7;cursor:pointer;box-shadow:0 2px 8px rgba(61,43,31,0.3)}
+#yearDisplay{font-size:18px;font-weight:600;min-width:100px;text-align:center;flex-shrink:0}
+.speed-control{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B5344;flex-shrink:0}
+.speed-control select{background:#FFF8E7;border:1px solid #C4A882;border-radius:6px;padding:2px 6px;font-family:Georgia,serif;color:#3D2B1F;cursor:pointer;font-size:12px}
+.legend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#6B5344}
+.legend-dot{width:12px;height:12px;border-radius:50%;border:2px solid rgba(61,43,31,0.25);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+#tooltip{position:absolute;background:#FFF8E7;border:2px solid #C4A882;border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.5;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20;max-width:240px;box-shadow:0 8px 24px rgba(61,43,31,0.2);font-family:Georgia,serif}
+#tooltip strong{font-size:14px;display:block;margin-bottom:2px}
+#tooltip .role{font-size:11px;color:#6B5344;font-style:italic;margin-bottom:4px}
+#tooltip .dates{font-size:12px;color:#6B5344}
+#tooltip .place{font-size:11px;color:#8B7355;margin-top:2px}
+@media(max-width:640px){.controls{min-width:unset;width:96%;padding:10px 14px}.title-overlay h1{font-size:16px}.title-overlay{padding:8px 16px}#yearDisplay{font-size:16px;min-width:85px}.timeline-row{gap:10px}.legend{gap:10px}}
 </style>
 </head>
 <body>
-<div id="map"></div>
-<div id="vignette"></div>
-
-<header id="hdr">
-  <div class="kicker">Atlante temporale</div>
-  <h1>Vitae Romanorum</h1>
-  <div class="sub">Nascite di imperatori e letterati · 70 a.C. – 400 d.C.</div>
-</header>
-
-<aside id="left" class="panel">
-  <div>
-    <div class="mini-lbl">FILTRA LE VITE</div>
-    <div class="flt">
-      <button class="cat-imp" data-cat="imp"><span class="fdot"></span>Imperatori<span class="cnt">17</span></button>
-      <button class="cat-poet" data-cat="poet"><span class="fdot"></span>Poeti<span class="cnt">12</span></button>
-      <button class="cat-lit" data-cat="lit"><span class="fdot"></span>Storici e letterati<span class="cnt">9</span></button>
-    </div>
-  </div>
-  <div>
-    <div id="aliveHead"><span id="aliveNum">0</span><span class="t">VITE IN QUEST'ANNO</span></div>
-    <div id="aliveList"></div>
-  </div>
-  <div id="eraBlock">
-    <div class="mini-lbl">L'ETÀ</div>
-    <div id="eraInner">
-      <div class="e-name" id="eName2"></div>
-      <div class="e-range" id="eRange"></div>
-      <p class="e-txt" id="eTxt"></p>
-    </div>
-  </div>
-</aside>
-
-<div id="yearBox">
-  <div class="big"><span id="yNum">90</span><span id="yEra">d.C.</span></div>
-  <div id="eraName">Dinastia flavia</div>
+<div id="app">
+<div class="title-overlay"><h1>Imperatori & Scrittori Romani</h1><p>70 a.C. &mdash; 400 d.C. &middot; Luoghi di nascita</p></div>
+<canvas id="mapCanvas"></canvas>
+<div id="tooltip"></div>
+<div class="controls">
+<div class="timeline-row">
+<button id="playBtn">&#9654;</button>
+<input type="range" id="yearSlider" min="-70" max="400" value="-70">
+<span id="yearDisplay">70 a.C.</span>
+<div class="speed-control"><label for="speed">Velocit&agrave;:</label><select id="speed"><option value="200">Lenta</option><option value="100" selected>Normale</option><option value="50">Veloce</option><option value="20">Turbo</option></select></div>
 </div>
-
-<aside id="right" class="panel">
-  <div class="panel-title"><span>CHRONICA</span><span class="cnt" id="evCount"></span></div>
-  <div id="feed"></div>
-</aside>
-
-<section id="card" class="panel"></section>
-
-<div id="chap">
-  <div class="k">CAPITOLO</div>
-  <div class="n" id="chapN"></div>
-  <div class="r" id="chapR"></div>
-  <div class="rule"></div>
+<div class="legend">
+<div class="legend-item"><span class="legend-dot" style="background:#E8A598;border-color:#C47A6E"></span>Imperatori</div>
+<div class="legend-item"><span class="legend-dot" style="background:#A8D5BA;border-color:#7AB89A"></span>Poeti</div>
+<div class="legend-item"><span class="legend-dot" style="background:#A8C8EC;border-color:#7AA8D4"></span>Scrittori</div>
+<div class="legend-item"><span class="legend-dot" style="background:#F0D78C;border-color:#D4B85E"></span>Scienziati</div>
 </div>
-
-<div id="bottom">
-  <div class="controls">
-    <div class="c-row">
-      <button id="playBtn" title="Riproduci / pausa (spazio)"></button>
-      <button id="resetBtn" class="icon-btn" title="Torna al 70 a.C."></button>
-      <button id="theaterBtn" class="icon-btn" title="Solo mappa (M)"></button>
-      <button id="themeBtn" class="icon-btn" title="Pergamena (T)"></button>
-    </div>
-    <div class="speed">
-      <button data-s="0">½×</button><button data-s="1" class="on">1×</button><button data-s="2">3×</button>
-    </div>
-    <div class="kbd-hint">spazio play · ← → anno · T tema · M mappa</div>
-  </div>
-  <div class="tl" id="tl">
-    <div class="tl-head" id="tlHead"><span id="cursLbl"></span></div>
-    <svg id="tlsvg"></svg>
-    <div id="tlcursor"></div>
-  </div>
 </div>
-
-<div id="tip"></div>
-<div id="toast"></div>
-<div id="grain"></div>
-
-<div id="intro">
-  <div class="intro-bg">SPQR</div>
-  <div class="intro-inner">
-    <div class="kicker">Atlante temporale · 70 a.C. → 400 d.C.</div>
-    <h1 class="intro-title">Vitae<br>Romanorum</h1>
-    <p>Dietro questo velo c'è già l'impero com'era nell'anno 90: undici vite in cammino fra Roma,
-       la Spagna e l'Asia. Trentotto destini — diciassette imperatori, dodici poeti, nove storici —
-       attraversano tredici età, dal tramonto della Repubblica alla spartizione dell'impero.
-       Alla scomparsa, ogni vita ricalca il suo ultimo viaggio, dalla città natale al luogo del congedo.</p>
-    <div class="intro-legend">
-      <span class="cat-imp"><span class="fdot"></span>Imperatori</span>
-      <span class="cat-poet"><span class="fdot"></span>Poeti</span>
-      <span class="cat-lit"><span class="fdot"></span>Storici e letterati</span>
-    </div>
-    <div class="intro-btns">
-      <button class="btn" id="startBtn">Inizia il viaggio</button>
-      <button class="btn ghost" id="skipBtn">Esplora liberamente</button>
-    </div>
-    <div class="intro-hint">SPAZIO riproduci · ← → un anno · M solo mappa · T tema · trascina la linea del tempo</div>
-  </div>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ================== TEMA ================== */
-const PAL={
-  dark:{imp:'#eaa6c4',poet:'#a9d6ab',lit:'#ecc78f'},
-  light:{imp:'#b25d84',poet:'#4e8a52',lit:'#b3822f'}
-};
-const URLS={
-  dark:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  light:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-};
-const ATTR='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
-let theme='dark';
-try{if(localStorage.getItem('vr-theme')==='light')theme='light';}catch(_){}
-document.documentElement.classList.toggle('light',theme==='light');
-
-const CATS={imp:{label:'Imperatori'},poet:{label:'Poeti'},lit:{label:'Storici e letterati'}};
-for(const k in CATS)CATS[k].color=PAL[theme][k];
-const CATORD={imp:0,poet:1,lit:2};
-
-/* ================== DATI ================== */
-const PEOPLE=[
- {n:'Virgilio',cat:'poet',role:'Poeta',b:-70,bc:0,bp:'Andes · Mantova',bla:[45.1167,10.8167],d:-19,dc:0,dp:'Brundisium · Brindisi',dla:[40.6384,17.9463]},
- {n:'Orazio',cat:'poet',role:'Poeta',b:-65,bc:0,bp:'Venusia · Venosa',bla:[40.9625,15.8153],d:-8,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Augusto',cat:'imp',role:'Imperatore',b:-63,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:14,dc:0,dp:'Nola',dla:[40.9258,14.5294]},
- {n:'Tito Livio',cat:'lit',role:'Storico',b:-59,bc:0,bp:'Patavium · Padova',bla:[45.4064,11.8768],d:17,dc:0,dp:'Patavium · Padova',dla:[45.4064,11.8768]},
- {n:'Properzio',cat:'poet',role:'Poeta',b:-50,bc:1,bp:'Asisium · Assisi',bla:[43.0707,12.6196],d:-15,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Tibullo',cat:'poet',role:'Poeta',b:-50,bc:1,bp:'Pedum · Gallicano nel Lazio',bla:[41.8697,12.8239],d:-19,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Ovidio',cat:'poet',role:'Poeta',b:-43,bc:0,bp:'Sulmo · Sulmona',bla:[42.0483,13.9253],d:17,dc:0,dLab:'17/18 d.C.',dp:'Tomis · Costanza (Romania)',dla:[44.1792,28.6498]},
- {n:'Tiberio',cat:'imp',role:'Imperatore',b:-42,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:37,dc:0,dp:'Misenum · Miseno',dla:[40.7850,14.0847]},
- {n:'Fedro',cat:'poet',role:'Favolista',b:-15,bc:1,bp:'Pydna · Grecia',bla:[40.3922,22.6133],d:50,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Claudio',cat:'imp',role:'Imperatore',b:-10,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:54,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Seneca il Giovane',cat:'lit',role:'Filosofo e drammaturgo',b:-4,bc:0,bp:'Corduba · Cordova',bla:[37.8882,-4.7794],d:65,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Caligola',cat:'imp',role:'Imperatore',b:12,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:41,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Plinio il Vecchio',cat:'lit',role:'Scienziato e scrittore',b:23,bc:0,bp:'Novum Comum · Como',bla:[45.8103,9.0863],d:79,dc:0,dp:'Stabiae · Castellammare di Stabia',dla:[40.6974,14.4827]},
- {n:'Persio',cat:'poet',role:'Poeta satirico',b:34,bc:0,bp:'Volaterrae · Volterra',bla:[43.4025,10.8606],d:62,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Quintiliano',cat:'lit',role:'Retore',b:35,bc:1,bp:'Calagurris · Calahorra',bla:[42.3045,-1.9644],d:96,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Nerone',cat:'imp',role:'Imperatore',b:37,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:68,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Lucano',cat:'poet',role:'Poeta',b:39,bc:0,bp:'Corduba · Cordova',bla:[37.8882,-4.7794],d:65,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Tito',cat:'imp',role:'Imperatore',b:39,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:81,dc:0,dp:"Aquae Cutiliae · Castel Sant'Angelo",dla:[42.3800,13.0167]},
- {n:'Marziale',cat:'poet',role:'Poeta epigrammatico',b:40,bc:1,bp:'Bilbilis · Calatayud',bla:[41.3532,-1.6441],d:104,dc:1,dp:'Bilbilis · Calatayud',dla:[41.3532,-1.6441]},
- {n:'Stazio',cat:'poet',role:'Poeta',b:45,bc:1,bp:'Neapolis · Napoli',bla:[40.8518,14.2681],d:96,dc:1,dp:'Neapolis · Napoli',dla:[40.8518,14.2681]},
- {n:'Domiziano',cat:'imp',role:'Imperatore',b:51,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:96,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Traiano',cat:'imp',role:'Imperatore',b:53,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:117,dc:0,dp:'Selinus · Gazipaşa (Turchia)',dla:[36.2625,32.3167]},
- {n:'Giovenale',cat:'poet',role:'Poeta satirico',b:55,bc:1,bp:'Aquinum · Aquino',bla:[41.4939,13.7042],d:127,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Tacito',cat:'lit',role:'Storico',b:56,bc:1,bp:'Interamna Nahars · Terni',bla:[42.5636,12.6483],d:120,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Plinio il Giovane',cat:'lit',role:'Epistolografo',b:61,bc:0,bp:'Novum Comum · Como',bla:[45.8103,9.0863],d:113,dc:0,dp:'Bitinia · İzmit',dla:[40.7350,29.9310]},
- {n:'Svetonio',cat:'lit',role:'Biografo',b:70,bc:1,bp:'Ostia Antica · Roma',bla:[41.7587,12.2908],d:126,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Adriano',cat:'imp',role:'Imperatore',b:76,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:138,dc:0,dp:'Baiae · Bacoli',dla:[40.8167,14.0833]},
- {n:'Antonino Pio',cat:'imp',role:'Imperatore',b:86,bc:0,bp:'Lanuvium · Lanuvio',bla:[41.6756,12.6983],d:161,dc:0,dp:'Lorium · Castel di Guido',dla:[41.8978,12.2783]},
- {n:'Marco Aurelio',cat:'imp',role:'Imperatore e filosofo',b:121,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:180,dc:0,dp:'Vindobona · Vienna',dla:[48.2082,16.3738]},
- {n:'Apuleio',cat:'lit',role:'Romanziere',b:124,bc:1,bp:'Madaurus · Algeria',bla:[36.0744,7.8208],d:170,dc:1,dp:'Cartagine · Tunisi',dla:[36.8528,10.3233]},
- {n:'Settimio Severo',cat:'imp',role:'Imperatore',b:145,bc:0,bp:'Leptis Magna · Libia',bla:[32.6378,14.2981],d:211,dc:0,dp:'Eburacum · York',dla:[53.9591,-1.0815]},
- {n:'Caracalla',cat:'imp',role:'Imperatore',b:188,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:217,dc:0,dp:'Carrhae · Harran',dla:[36.8647,39.0308]},
- {n:'Diocleziano',cat:'imp',role:'Imperatore',b:244,bc:0,bp:'Salona · Solino',bla:[43.5381,16.4839],d:311,dc:0,dp:'Spalatum · Spalato',dla:[43.5081,16.4402]},
- {n:'Costantino I',cat:'imp',role:'Imperatore',b:272,bc:0,bp:'Naissus · Niš',bla:[43.3209,21.8958],d:337,dc:0,dp:'Nicomedia · İzmit',dla:[40.7656,29.9406]},
- {n:'Ammiano Marcellino',cat:'lit',role:'Storico',b:330,bc:1,bp:'Antiochia · Antakya',bla:[36.2021,36.1604],d:397,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:"Giuliano l'Apostata",cat:'imp',role:'Imperatore e scrittore',b:331,bc:0,bp:'Costantinopoli · Istanbul',bla:[41.0082,28.9784],d:363,dc:0,dp:'Samarra · Iraq',dla:[34.1983,43.8742]},
- {n:'Teodosio I',cat:'imp',role:'Imperatore',b:347,bc:0,bp:'Cauca · Coca',bla:[41.2161,-4.5236],d:395,dc:0,dp:'Mediolanum · Milano',dla:[45.4642,9.1900]},
- {n:'Claudiano',cat:'poet',role:'Poeta',b:370,bc:1,bp:"Alessandria d'Egitto",bla:[31.2001,29.9187],d:404,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
-];
-PEOPLE.forEach((p,i)=>p.id=i);
-
-/* ================== LE TREDICI ETÀ ================== */
-const ERAS=[
- {s:-70,name:'Gli ultimi anni della Repubblica',
-  txt:'Roma domina il Mediterraneo ma la Repubblica si logora: poteri straordinari, congiure, guerra civile fra Cesare e Pompeo. Nell\u2019età di Cicerone crescono i giovani Virgilio, Orazio e Livio.'},
- {s:-27,name:'La rivoluzione di Augusto',
-  txt:'Vincitore di Azio, Ottaviano prende il nome di Augusto e fonda il Principato: un potere personale rivestito di forme repubblicane. È l\u2019età d\u2019oro delle lettere: Virgilio, Orazio, Properzio, Ovidio.'},
- {s:14,name:'Dinastia giulio-claudia',
-  txt:'Da Tiberio a Nerone, l\u2019eredità di Augusto passa a quattro principi di sangue difficile: delazioni, processi, morti eccellenti. Seneca insegna a Nerone, e con lui cadranno Lucano e Persio.'},
- {s:69,name:'L\u2019anno dei quattro imperatori',
-  txt:'In dodici mesi Galba, Otone, Vitelio e Vespasiano si contendono il trono. Le legioni di frontiera hanno imparato la lezione: d\u2019ora in poi potranno fare e disfare gli imperatori.'},
- {s:70,name:'Dinastia flavia',
-  txt:'Vespasiano, l\u2019uomo nuovo dell\u2019esercito, risana le finanze e ricostruisce il Campidoglio; Tito prende Gerusalemme e lascia il Colosseo. Domiziano chiude l\u2019età con un regno autoritario.'},
- {s:96,name:'L\u2019età degli imperatori adottivi',
-  txt:'Il trono passa al migliore, non al figlio: Traiano porta l\u2019impero alla massima estensione, Adriano lo cinge di mura, Marco Aurelio lo difende scrivendo i suoi Ricordi. È il secolo d\u2019oro di Tacito, Plinio e Giovenale.'},
- {s:193,name:'Dinastia dei Severi',
-  txt:'Settimio Severo, venuto da Leptis Magna, trasforma l\u2019impero in una monarchia militare. Caracalla nel 212 concede la cittadinanza a tutti gli uomini liberi — e cadrà lontano, in Mesopotamia.'},
- {s:235,name:'Crisi del III secolo',
-  txt:'Cinquant\u2019anni di anarchia: generali acclamati e assassinati in rapida successione, invasioni, peste, moneta che si svaluta. Nessuna delle vite qui raccolte nasce in questo mezzo secolo buio.'},
- {s:284,name:'Tetrarchia',
-  txt:'Diocleziano divide il potere fra due Augusti e due Cesari, riorganizza tasse e amministrazione e perseguita i cristiani. Nel 305 farà ciò che nessun imperatore ha fatto: abdicare, per ritirarsi a coltivare l\u2019orto a Spalato.'},
- {s:306,name:'L\u2019età di Costantino',
-  txt:'Costantino vince a Ponte Milvio, riunisce l\u2019impero e nel 313 legalizza il cristianesimo; nel 330 inaugura Costantinopoli, la nuova Roma sul Bosforo. Giuliano tenterà poi, invano, di restaurare gli dèi antichi.'},
- {s:364,name:'Valentiniano e Valente',
-  txt:'L\u2019impero è ormai governato da due fratelli, uno per l\u2019Occidente e uno per l\u2019Oriente. Nel 378 Valente cade con il suo esercito ad Adrianopoli contro i Goti: la peggior disfatta dopo Canne.'},
- {s:379,name:'L\u2019età di Teodosio',
-  txt:'Teodosio, ultimo imperatore dell\u2019impero indiviso, fa del cristianesimo niceno la religione di Stato e sopprime i culti antichi. A Roma, ormai altrove, Claudiano celebra ancora gli dèi di una volta.'},
- {s:395,name:'Occidente e Oriente divisi',
-  txt:'Alla morte di Teodosio l\u2019impero non si ricongiungerà mai più: Onorio a Ravenna, Arcadio a Costantinopoli. Roma, saccheggiata da Alarico nel 410, esce dal centro della storia.'},
-];
-const YEAR_MIN=-70,YEAR_MAX=400,DIORAMA=90;
-const fmtY=(y,c)=>(c?'c. ':'')+(y<0?(-y)+' a.C.':y+' d.C.');
-ERAS.forEach((e,i)=>{
-  e.end=i<ERAS.length-1?ERAS[i+1].s-1:YEAR_MAX;
-  e.range=e.s===e.end?fmtY(e.s):fmtY(e.s)+' \u2013 '+fmtY(e.end);
-});
-const eraOf=Y=>{let e=ERAS[0];for(const x of ERAS)if(Y>=x.s)e=x;return e;};
-
-/* ================== TEMPO (nessun anno zero) ================== */
-const idxToYear=i=>i<70?i-70:i-69;
-const yearToIdx=y=>y<0?y+70:y+69;
-const IDX_MAX=yearToIdx(400);
-const gm=ll=>'https://www.google.com/maps?q='+ll[0]+','+ll[1];
-const ageOf=p=>p.b<0&&p.d>0?(p.d-p.b-1):(p.d-p.b);
-
-const EVENTS=[];
-PEOPLE.forEach(p=>{EVENTS.push({y:p.b,t:'b',p},{y:p.d,t:'d',p});});
-EVENTS.sort((a,b)=>a.y-b.y||(a.t===b.t?0:a.t==='b'?-1:1));
-const byYear=new Map();
-EVENTS.forEach(e=>{if(!byYear.has(e.y))byYear.set(e.y,[]);byYear.get(e.y).push(e);});
-
-/* ================== MAPPA (con riserva automatica sui tile) ================== */
-const OVERVIEW=[[29,-12],[51,39]];
-const OVERVIEW_PAD={paddingTopLeft:L.point(310,120),paddingBottomRight:L.point(330,160)};
-const map=L.map('map',{zoomControl:false,minZoom:3,maxZoom:18,keyboard:false});
-
-let tileLayer=null,usingFallback=false,fallArmed=false,errCount=0;
-function baseLayer(){
-  return usingFallback
-    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
-      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})
-    :L.tileLayer(URLS[theme],{subdomains:'abcd',maxZoom:19,attribution:ATTR});
-}
-function watchTiles(layer){
-  layer.on('tileerror',()=>{
-    if(usingFallback)return;
-    errCount++;
-    if(errCount>=8&&!fallArmed){
-      fallArmed=true;usingFallback=true;
-      const old=tileLayer;
-      tileLayer=baseLayer();watchTiles(tileLayer);
-      tileLayer.addTo(map);map.removeLayer(old);
-      toast('Tile CARTO non raggiungibili · passo a OpenStreetMap');
-    }
-  });
-  layer.on('tileload',()=>{if(errCount>0)errCount--;});
-}
-tileLayer=baseLayer();watchTiles(tileLayer);tileLayer.addTo(map);
-map.fitBounds(OVERVIEW,OVERVIEW_PAD);
-L.control.zoom({position:'bottomleft'}).addTo(map);
-L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
-
-/* ================== GRUPPI DI CITTÀ COINCIDENTI ================== */
-const groupsMulti=[];
 (function(){
-  const g={};
-  PEOPLE.forEach(p=>{const k=p.bla[0].toFixed(2)+','+p.bla[1].toFixed(2);(g[k]=g[k]||[]).push(p);});
-  Object.values(g).forEach(arr=>{
-    if(arr.length===1){arr[0]._g={base:arr[0].bla,count:1,members:arr,refresh(){}};return;}
-    arr.sort((a,b)=>a.b-b.b||a.id-b.id);
-    const R=40+arr.length*13;
-    const gr={base:arr[0].bla,count:arr.length,members:arr.slice(),_dot:null};
-    arr.forEach((p,i)=>{
-      const a=-Math.PI/2+(i/arr.length)*Math.PI*2+0.4;
-      p._dx=Math.cos(a)*R;p._dy=Math.sin(a)*R;p._slotA=a;p._g=gr;
-    });
-    gr.refresh=()=>{
-      const on=gr.members.some(p=>p._m);
-      if(on&&!gr._dot){
-        gr._dot=L.circleMarker(gr.base,{radius:3,color:'#efe6d8',weight:1.1,opacity:.85,
-          fillColor:'#efe6d8',fillOpacity:.4,interactive:false}).addTo(map);
-      }else if(!on&&gr._dot){map.removeLayer(gr._dot);gr._dot=null;}
-    };
-    groupsMulti.push(gr);
-  });
+const cats={imperatore:{c:'#E8A598',d:'#C47A6E'},poeta:{c:'#A8D5BA',d:'#7AB89A'},scrittore:{c:'#A8C8EC',d:'#7AA8D4'},scienziato:{c:'#F0D78C',d:'#D4B85E'}};
+function getCat(r){const l=r.toLowerCase();if(l.includes('imperatore'))return'imperatore';if(l.includes('scienziato'))return'scienziato';if(l.includes('poeta')||l.includes('favolista'))return'poeta';return'scrittore';}
+function fmt(y){return y<0?Math.abs(y)+' a.C.':y+' d.C.';}
+
+const people=[
+{n:'Virgilio',r:'Poeta',b:-70,d:-19,lat:45.1167,lng:10.8167,p:'Andes (Mantova)'},{n:'Orazio',r:'Poeta',b:-65,d:-8,lat:40.9625,lng:15.8153,p:'Venusia (Venosa)'},{n:'Augusto',r:'Imperatore',b:-63,d:14,lat:41.8902,lng:12.4922,p:'Roma'},{n:'Tito Livio',r:'Storico / Scrittore',b:-59,d:17,lat:45.4064,lng:11.8768,p:'Patavium (Padova)'},{n:'Properzio',r:'Poeta',b:-50,d:-15,lat:43.0707,lng:12.6196,p:'Asisium (Assisi)'},{n:'Tibullo',r:'Poeta',b:-50,d:-19,lat:41.8697,lng:12.8239,p:'Pedum (Gallicano nel Lazio)'},{n:'Ovidio',r:'Poeta',b:-43,d:17,lat:42.0483,lng:13.9253,p:'Sulmo (Sulmona)'},{n:'Tiberio',r:'Imperatore',b:-42,d:37,lat:41.8902,lng:12.4922,p:'Roma'},{n:'Fedro',r:'Favolista / Poeta',b:-15,d:50,lat:40.3922,lng:22.6133,p:'Pydna (Grecia)'},{n:'Claudio',r:'Imperatore',b:-10,d:54,lat:45.7640,lng:4.8357,p:'Lugdunum (Lione)'},{n:'Seneca il Giovane',r:'Filosofo / Drammaturgo',b:-4,d:65,lat:37.8882,lng:-4.7794,p:'Corduba (Cordova)'},{n:'Caligola',r:'Imperatore',b:12,d:41,lat:41.4474,lng:12.6282,p:'Antium (Anzio)'},{n:'Plinio il Vecchio',r:'Scienziato / Scrittore',b:23,d:79,lat:45.8103,lng:9.0863,p:'Novum Comum (Como)'},{n:'Persio',r:'Poeta satirico',b:34,d:62,lat:43.4025,lng:10.8606,p:'Volaterrae (Volterra)'},{n:'Quintiliano',r:'Retore / Scrittore',b:35,d:96,lat:42.3045,lng:-1.9644,p:'Calagurris (Calahorra)'},{n:'Nerone',r:'Imperatore',b:37,d:68,lat:41.4474,lng:12.6282,p:'Antium (Anzio)'},{n:'Lucano',r:'Poeta',b:39,d:65,lat:37.8882,lng:-4.7794,p:'Corduba (Cordova)'},{n:'Tito',r:'Imperatore',b:39,d:81,lat:41.8902,lng:12.4922,p:'Roma'},{n:'Marziale',r:'Poeta epigrammatico',b:40,d:104,lat:41.3532,lng:-1.6441,p:'Bilbilis (Calatayud)'},{n:'Stazio',r:'Poeta',b:45,d:96,lat:40.8518,lng:14.2681,p:'Neapolis (Napoli)'},{n:'Domiziano',r:'Imperatore',b:51,d:96,lat:41.8902,lng:12.4922,p:'Roma'},{n:'Traiano',r:'Imperatore',b:53,d:117,lat:37.4439,lng:-6.0461,p:'Italica (Santiponce)'},{n:'Giovenale',r:'Poeta satirico',b:55,d:127,lat:41.4939,lng:13.7042,p:'Aquinum (Aquino)'},{n:'Tacito',r:'Storico / Scrittore',b:56,d:120,lat:42.5636,lng:12.6483,p:'Interamna Nahars (Terni)'},{n:'Plinio il Giovane',r:'Scrittore / Epistolografo',b:61,d:113,lat:45.8103,lng:9.0863,p:'Novum Comum (Como)'},{n:'Svetonio',r:'Biografo / Scrittore',b:70,d:126,lat:41.7587,lng:12.2908,p:'Ostia Antica'},{n:'Adriano',r:'Imperatore',b:76,d:138,lat:37.4439,lng:-6.0461,p:'Italica (Santiponce)'},{n:'Antonino Pio',r:'Imperatore',b:86,d:161,lat:41.6756,lng:12.6983,p:'Lanuvium (Lanuvio)'},{n:'Marco Aurelio',r:'Imperatore / Filosofo',b:121,d:180,lat:41.8902,lng:12.4922,p:'Roma'},{n:'Apuleio',r:'Scrittore / Romanziere',b:124,d:170,lat:36.0744,lng:7.8208,p:"Madaurus"},{n:'Settimio Severo',r:'Imperatore',b:145,d:211,lat:32.6378,lng:14.2981,p:'Leptis Magna (Al-Khums)'},{n:'Caracalla',r:'Imperatore',b:188,d:217,lat:45.7640,lng:4.8357,p:'Lugdunum (Lione)'},{n:'Diocleziano',r:'Imperatore',b:244,d:311,lat:43.5381,lng:16.4839,p:'Salona (Solin)'},{n:'Costantino I',r:'Imperatore',b:272,d:337,lat:43.3209,lng:21.8958,p:'Naissus (Nis)'},{n:'Ammiano Marcellino',r:'Storico / Scrittore',b:330,d:397,lat:36.2021,lng:36.1604,p:'Antiochia (Antakya)'},{n:"Giuliano l'Apostata",r:'Imperatore / Scrittore',b:331,d:363,lat:41.0082,lng:28.9784,p:'Costantinopoli (Istanbul)'},{n:'Teodosio I',r:'Imperatore',b:347,d:395,lat:41.2161,lng:-4.5236,p:'Cauca (Coca)'},{n:'Claudiano',r:'Poeta',b:370,d:404,lat:31.2001,lng:29.9187,p:'Alessandria (Egitto)'}
+];
+people.forEach(p=>{p.cat=getCat(p.r);p.catInfo=cats[p.cat];p.state='hidden';p.anim=0;p.ripple=0;p.px=0;p.py=0;});
+
+const canvas=document.getElementById('mapCanvas');
+const ctx=canvas.getContext('2d');
+const tooltip=document.getElementById('tooltip');
+const slider=document.getElementById('yearSlider');
+const yearLabel=document.getElementById('yearDisplay');
+const playBtn=document.getElementById('playBtn');
+const speedSel=document.getElementById('speed');
+
+let W,H,DPR;
+function resize(){
+const rect=canvas.parentElement.getBoundingClientRect();
+W=rect.width;H=rect.height;
+DPR=window.devicePixelRatio||1;
+canvas.width=W*DPR;canvas.height=H*DPR;
+canvas.style.width=W+'px';canvas.style.height=H+'px';
+ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();window.addEventListener('resize',resize);
+
+const lonMin=-7,lonMax=38,latMin=29,latMax=55,pad=36;
+function proj(lat,lng){return{x:pad+(lng-lonMin)/(lonMax-lonMin)*(W-pad*2),y:pad+(latMax-lat)/(latMax-latMin)*(H-pad*2)};}
+
+let currentYear=-70,isPlaying=false,playInt=null,hovered=null;
+
+function updateState(y){
+people.forEach(p=>{
+const wasVis=p.state==='alive'||p.state==='appearing'||p.state==='disappearing';
+const isVis=y>=p.b&&y<=p.d;
+if(isVis&&!wasVis){p.state='appearing';p.anim=0;p.ripple=1;}
+else if(!isVis&&wasVis){p.state='disappearing';p.anim=1;}
+else if(isVis&&wasVis&&p.state==='disappearing'){p.state='alive';p.anim=1;}
+else if(isVis&&p.state==='appearing'&&p.anim>=1){p.state='alive';p.anim=1;}
+else if(!isVis&&p.state==='disappearing'&&p.anim<=0){p.state='hidden';p.anim=0;}
+});
+}
+
+function draw(){
+ctx.clearRect(0,0,W,H);
+ctx.fillStyle='#F5E6C8';ctx.fillRect(0,0,W,H);
+ctx.strokeStyle='rgba(139,90,43,0.04)';ctx.lineWidth=1;
+for(let i=0;i<H;i+=4){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(W,i);ctx.stroke();}
+ctx.strokeStyle='rgba(61,43,31,0.08)';ctx.lineWidth=0.5;
+for(let lng=Math.ceil(lonMin/5)*5;lng<=lonMax;lng+=5){
+const x=proj(0,lng).x;ctx.beginPath();ctx.moveTo(x,pad);ctx.lineTo(x,H-pad);ctx.stroke();
+ctx.fillStyle='rgba(61,43,31,0.25)';ctx.font='10px Georgia';ctx.textAlign='center';ctx.fillText(lng+'°E',x,H-pad+14);
+}
+for(let lat=Math.ceil(latMin/5)*5;lat<=latMax;lat+=5){
+const y=proj(lat,0).y;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(W-pad,y);ctx.stroke();
+ctx.fillStyle='rgba(61,43,31,0.25)';ctx.textAlign='right';ctx.fillText(lat+'°N',pad-6,y+3);
+}
+
+// Simple land shapes
+ctx.fillStyle='rgba(200,180,150,0.3)';ctx.strokeStyle='rgba(61,43,31,0.2)';ctx.lineWidth=1.5;
+// Italy
+ctx.beginPath();const italy=[[47,9],[46,11],[44,12],[42,13],[40,16],[39,17],[38,16],[39,14],[40,12],[42,11],[44,10],[46,9],[47,9]];
+italy.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Sicily
+ctx.beginPath();const sic=[[38.5,12.5],[38,13],[37,13],[36.5,12.5],[37,11.5],[38,11.5]];
+sic.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Sardinia
+ctx.beginPath();const sar=[[41.5,8],[41,9.5],[40,10],[39,9],[39.5,8],[40.5,7.5]];
+sar.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Corsica
+ctx.beginPath();const cor=[[43,9],[42.5,9.5],[41.5,9],[41.5,8.5],[42.5,8.5]];
+cor.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Greece
+ctx.beginPath();const gre=[[41,20],[40,22],[39,24],[38,25],[37,24],[36,23],[36,25],[37,28],[38,28.5],[39,27],[40,26],[41,25],[42,24],[43,23],[44,22],[41,20]];
+gre.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Spain
+ctx.beginPath();const spa=[[44,-9],[44,-2],[43,3],[42,3],[41,2],[40,0],[39,-0.5],[37,-6],[36,-5],[36,-2],[37,-0.5],[38,0],[44,-9]];
+spa.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// France
+ctx.beginPath();const fra=[[51,-5],[51,2],[48,4.5],[46,4.5],[45,4.8],[43.5,4.5],[43,3],[42.5,3],[42.5,1.5],[43,1],[51,-5]];
+fra.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// North Africa
+ctx.beginPath();const afr=[[37,-8],[37,-5],[36,0],[35,5],[34,10],[33,12],[32,14],[31,16],[30,18],[29,20],[28,22],[27,24],[26,26],[25,28],[24,30],[23,32],[32,30],[37,-8]];
+afr.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Asia Minor
+ctx.beginPath();const asi=[[42,28],[41,30],[40,32],[39,34],[38,35],[37,36],[36,36],[36,35],[36.5,34],[37,33],[37.5,32],[38,31],[39,30],[40,29],[41,28.5],[42,28]];
+asi.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+// Egypt
+ctx.beginPath();const egy=[[32,30],[31,31],[30,32],[29,33],[28,34],[27,35],[26,34],[25,33],[24,32],[23,31],[22,30],[22,29],[23,29],[24,29.5],[25,30],[26,30.5],[27,31],[28,31],[29,30.5],[30,30],[31,30],[32,30]];
+egy.forEach((pt,i)=>{const p=proj(pt[0],pt[1]);if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+ctx.closePath();ctx.fill();ctx.stroke();
+
+// Sea color
+ctx.fillStyle='rgba(168,200,236,0.15)';
+ctx.beginPath();ctx.rect(pad,pad,W-pad*2,H-pad*2);ctx.fill();
+
+// Compute positions
+people.forEach(p=>{const pos=proj(p.lat,p.lng);p.px=pos.x;p.py=pos.y;});
+
+// Spiderfy detection
+const groups=[];const used=new Set();
+people.forEach((p,i)=>{if(used.has(i))return;const g=[p];used.add(i);people.forEach((q,j)=>{if(i===j||used.has(j))return;const dx=p.px-q.px,dy=p.py-q.py;if(Math.sqrt(dx*dx+dy*dy)<14){g.push(q);used.add(j);}});if(g.length>1)groups.push(g);});
+
+let activeGroup=null;
+if(hovered){for(const g of groups){if(g.includes(hovered)){activeGroup=g;break;}}}
+
+// Update animations
+people.forEach(p=>{
+if(p.state==='appearing'){p.anim+=0.06;if(p.anim>1)p.anim=1;}
+if(p.state==='disappearing'){p.anim-=0.06;if(p.anim<0)p.anim=0;}
+if(p.ripple>0)p.ripple-=0.02;
+});
+
+// Draw people
+people.forEach((p,i)=>{
+if(p.state==='hidden')return;
+const alpha=p.anim;
+if(alpha<=0.01)return;
+let sx=p.px,sy=p.py;
+if(activeGroup&&activeGroup.includes(p)&&activeGroup.length>1){
+const idx=activeGroup.indexOf(p);
+const angle=(Math.PI*2*idx)/activeGroup.length-Math.PI/2;
+const r=22;
+sx=p.px+Math.cos(angle)*r;
+sy=p.py+Math.sin(angle)*r;
+ctx.strokeStyle=p.catInfo.d;ctx.globalAlpha=0.4;ctx.lineWidth=1;
+ctx.beginPath();ctx.moveTo(p.px,p.py);ctx.lineTo(sx,sy);ctx.stroke();
+}
+ctx.globalAlpha=alpha;
+if(p.ripple>0){
+ctx.strokeStyle=p.catInfo.d;ctx.lineWidth=1.5;ctx.globalAlpha=p.ripple*0.5;
+ctx.beginPath();ctx.arc(sx,sy,8+p.ripple*20,0,Math.PI*2);ctx.stroke();
+}
+ctx.globalAlpha=alpha;
+const pulse=p.state==='alive'?1+Math.sin(Date.now()/400+i)*0.12:1;
+const r=7*pulse;
+const grad=ctx.createRadialGradient(sx,sy,0,sx,sy,r+6);
+grad.addColorStop(0,p.catInfo.c+'66');grad.addColorStop(1,p.catInfo.c+'00');
+ctx.fillStyle=grad;ctx.beginPath();ctx.arc(sx,sy,r+6,0,Math.PI*2);ctx.fill();
+ctx.fillStyle=p.catInfo.c;ctx.strokeStyle=p.catInfo.d;ctx.lineWidth=2;
+ctx.beginPath();ctx.arc(sx,sy,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+ctx.fillStyle='#3D2B1F';ctx.font='600 8px Georgia';ctx.textAlign='center';ctx.textBaseline='middle';
+ctx.fillText(p.n.charAt(0),sx,sy);
+if(p===hovered||(p.state==='alive'&&!activeGroup)){
+ctx.fillStyle='rgba(61,43,31,0.85)';ctx.font='500 10px Georgia';ctx.textAlign='center';
+ctx.fillText(p.n,sx,sy-r-10);
+}
+ctx.globalAlpha=1;
+});
+
+requestAnimationFrame(draw);
+}
+
+// Mouse
+function getPos(e){const rect=canvas.getBoundingClientRect();return{x:e.clientX-rect.left,y:e.clientY-rect.top};}
+canvas.addEventListener('mousemove',e=>{
+const pos=getPos(e);
+let closest=null,minD=20;
+people.forEach(p=>{if(p.state==='hidden'||p.anim<0.5)return;const dx=pos.x-p.px,dy=pos.y-p.py;const d=Math.sqrt(dx*dx+dy*dy);if(d<minD){minD=d;closest=p;}});
+hovered=closest;
+if(hovered){
+tooltip.style.opacity='1';tooltip.style.left=(pos.x+14)+'px';tooltip.style.top=(pos.y-10)+'px';
+tooltip.innerHTML='<strong>'+hovered.n+'</strong><br><span class="role">'+hovered.r+'</span><br><span class="dates">'+fmt(hovered.b)+' &mdash; '+fmt(hovered.d)+'</span><br><span class="place">'+hovered.p+'</span>';
+}else{tooltip.style.opacity='0';}
+});
+canvas.addEventListener('mouseleave',()=>{hovered=null;tooltip.style.opacity='0';});
+
+// Controls
+function setYear(y){
+currentYear=Math.max(-70,Math.min(400,y));
+slider.value=currentYear;
+yearLabel.textContent=fmt(currentYear);
+updateState(currentYear);
+}
+slider.addEventListener('input',e=>{setYear(parseInt(e.target.value));if(isPlaying)stop();});
+function start(){isPlaying=true;playBtn.innerHTML='&#10074;&#10074;';const sp=parseInt(speedSel.value);playInt=setInterval(()=>{if(currentYear>=400){stop();return;}setYear(currentYear+1);},sp);}
+function stop(){isPlaying=false;playBtn.innerHTML='&#9654;';if(playInt){clearInterval(playInt);playInt=null;}}
+playBtn.addEventListener('click',()=>isPlaying?stop():start());
+speedSel.addEventListener('change',()=>{if(isPlaying){stop();start();}});
+
+updateState(-70);
+draw();
 })();
-
-function layoutAll(){
-  for(const g of groupsMulti){
-    const pt=map.latLngToLayerPoint(g.base);
-    for(const p of g.members){
-      if(!p._m)continue;
-      const ll=map.layerPointToLatLng(pt.add([p._dx,p._dy]));
-      p._m.marker.setLatLng(ll);
-      if(p._m.line)p._m.line.setLatLngs([g.base,ll]);
-    }
-  }
-}
-let layoutRAF=0;
-map.on('zoom',()=>{if(!layoutRAF)layoutRAF=requestAnimationFrame(()=>{layoutRAF=0;layoutAll();});});
-map.on('zoomend',layoutAll);
-
-/* ================== EFFETTI ================== */
-const getMkEl=p=>{const e=p._m&&p._m.marker.getElement();return e?e.querySelector('.mk'):null;};
-
-function birthFX(p){
-  const el=getMkEl(p);if(!el)return;
-  const dot=el.querySelector('.mk-dot');if(!dot)return;
-  const n=p.cat==='imp'?3:2;
-  for(let i=0;i<n;i++){
-    const r=document.createElement('span');
-    r.className='rip'+(p.cat==='imp'?' big':'');
-    r.style.animationDelay=(i*(p.cat==='imp'?0.22:0.3))+'s';
-    dot.appendChild(r);setTimeout(()=>r.remove(),2300);
-  }
-}
-function deathFX(p){
-  const el=getMkEl(p);if(!el)return;
-  const dot=el.querySelector('.mk-dot');if(!dot)return;
-  for(let i=0;i<9;i++){
-    const s=document.createElement('span');s.className='spark';
-    const a=Math.random()*Math.PI*2,d=26+Math.random()*36;
-    s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(1)+'px');
-    s.style.setProperty('--dy',(Math.sin(a)*d).toFixed(1)+'px');
-    dot.appendChild(s);setTimeout(()=>s.remove(),900);
-  }
-  const x=document.createElement('span');x.className='cross';x.textContent='\u2020';
-  dot.appendChild(x);setTimeout(()=>x.remove(),1400);
-}
-
-/* l'ultimo viaggio: arco dalla nascita alla morte */
-function journeyFX(p,done){
-  const a=p.bla,b=p.dla;
-  const col=CATS[p.cat].color;
-  const j=p._m.j={line:null,comet:null,dx:null,raf:0,t4:null,dead:false};
-  if(Math.hypot(a[0]-b[0],a[1]-b[1])<0.3){done();return;}
-  const N=64,pts=[];
-  const dist=Math.hypot(b[0]-a[0],b[1]-a[1]);
-  const c=[(a[0]+b[0])/2+dist*0.18,(a[1]+b[1])/2];
-  for(let i=0;i<=N;i++){const t=i/N,u=1-t;
-    pts.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]]);}
-  j.line=L.polyline([pts[0]],{color:col,weight:2,opacity:.85,dashArray:'2 6',
-    lineCap:'round',interactive:false}).addTo(map);
-  j.comet=L.marker(pts[0],{interactive:false,zIndexOffset:800,
-    icon:L.divIcon({className:'mkhost',html:'<div class="comet" style="--c:'+col+'"></div>',iconSize:[0,0]})
-  }).addTo(map);
-  const D=Math.max(900,Math.min(1700,dist*90));
-  const t0=performance.now();
-  const step=now=>{
-    if(j.dead)return;
-    const t=Math.min(1,(now-t0)/D);
-    const head=Math.max(1,Math.round(t*N));
-    j.line.setLatLngs(pts.slice(0,head+1));
-    j.comet.setLatLng(pts[head]);
-    if(t<1)j.raf=requestAnimationFrame(step);else finish();
-  };
-  const finish=()=>{
-    if(j.dead)return;
-    map.removeLayer(j.comet);j.comet=null;
-    j.dx=L.marker(b,{interactive:false,
-      icon:L.divIcon({className:'mkhost',html:'<div class="dxcross" style="color:'+col+'">\u2020</div>',iconSize:[0,0]})
-    }).addTo(map);
-    let o=.85;
-    j.t4=setInterval(()=>{
-      o-=.18;
-      if(o<=0){clearInterval(j.t4);j.t4=null;
-        if(j.line){map.removeLayer(j.line);j.line=null;}
-        if(j.dx){map.removeLayer(j.dx);j.dx=null;}
-      }else if(j.line)j.line.setStyle({opacity:o});
-    },110);
-    done();
-  };
-  j.raf=requestAnimationFrame(step);
-}
-
-/* ================== MARKER: comparsa / scomparsa ================== */
-function spawn(p,mode){
-  const g=p._g,multi=g&&g.count>1;
-  const flip=multi&&Math.cos(p._slotA)<-0.25;
-  let ll=p.bla;
-  if(multi){
-    const pt=map.latLngToLayerPoint(g.base);
-    ll=map.layerPointToLatLng(pt.add([p._dx,p._dy]));
-  }
-  const html='<div class="mk cat-'+p.cat+(flip?' flip':'')+(mode==='anim'?' birth':' fadein')+
-    '" style="--pd:'+(Math.random()*2).toFixed(2)+'s">'+
-    '<div class="mk-in"><span class="mk-dot"></span><span class="mk-name">'+p.n+'</span></div></div>';
-  const mk=L.marker(ll,{icon:L.divIcon({className:'mkhost',html,iconSize:[0,0]}),
-    riseOnHover:true,keyboard:false}).addTo(map);
-  mk.on('click',()=>openCard(p));
-  p._m={marker:mk,line:null,dying:false,t:null,j:null};
-  if(multi){
-    p._m.line=L.polyline([g.base,ll],{color:'#efe6d8',opacity:.22,weight:1,
-      dashArray:'1 4',interactive:false}).addTo(map);
-    g.refresh();
-  }
-  if(mode==='anim')birthFX(p);
-  setTimeout(()=>{const k=getMkEl(p);if(k)k.classList.remove('birth','fadein');},950);
-}
-function hardRemove(p){
-  if(!p._m)return;
-  clearTimeout(p._m.t);
-  const j=p._m.j;
-  if(j){
-    j.dead=true;cancelAnimationFrame(j.raf);
-    if(j.t4)clearInterval(j.t4);
-    if(j.line)map.removeLayer(j.line);
-    if(j.comet)map.removeLayer(j.comet);
-    if(j.dx)map.removeLayer(j.dx);
-  }
-  map.removeLayer(p._m.marker);
-  if(p._m.line)map.removeLayer(p._m.line);
-  p._m=null;
-  if(p._g&&p._g.count>1)p._g.refresh();
-}
-function despawn(p,mode,Y,stagger){
-  const m=p._m;m.dying=true;
-  if(mode==='anim'&&Y>=p.d){
-    m.t=setTimeout(()=>{
-      if(p._m!==m)return;
-      journeyFX(p,()=>{
-        if(p._m!==m)return;
-        const el=getMkEl(p);
-        if(!el){hardRemove(p);return;}
-        el.classList.add('dying');
-        deathFX(p);
-        m.t=setTimeout(()=>{if(p._m===m)hardRemove(p);},780);
-      });
-    },stagger||0);
-  }else{
-    const el=getMkEl(p);
-    if(el){el.classList.add('fadeout');m.t=setTimeout(()=>{if(p._m===m)hardRemove(p);},330);}
-    else m.t=setTimeout(()=>{if(p._m===m)hardRemove(p);},30);
-  }
-}
-function updateWorld(Y,mode){
-  let di=0;
-  for(const p of PEOPLE){
-    const alive=catOn[p.cat]&&Y>=p.b&&Y<p.d;
-    if(alive){
-      if(p._m&&!p._m.dying)continue;
-      if(p._m)hardRemove(p);
-      spawn(p,mode);
-    }else if(p._m&&!p._m.dying){
-      despawn(p,mode,Y,mode==='anim'?(di++)*230:0);
-    }
-  }
-  layoutAll();
-}
-
-/* ================== HUD ================== */
-const $=id=>document.getElementById(id);
-const yNum=$('yNum'),yEra=$('yEra'),eraEl=$('eraName'),feedEl=$('feed'),evCount=$('evCount'),
-      aliveNum=$('aliveNum'),aliveList=$('aliveList'),tlcur=$('tlcursor'),cursLbl=$('cursLbl'),
-      tl=$('tl'),tlsvg=$('tlsvg'),tlHead=$('tlHead'),tip=$('tip'),
-      cardEl=$('card'),rightEl=$('right'),playBtn=$('playBtn'),
-      chap=$('chap'),chapN=$('chapN'),chapR=$('chapR'),
-      eName2=$('eName2'),eRange=$('eRange'),eTxt=$('eTxt'),eraInner=$('eraInner');
-let curYear=null,curEra='',cardP=null,lastFeedY=null,introActive=true,dragActive=false;
-
-let toastT=null;
-function toast(msg){
-  const t=$('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-function updateCursor(Y){
-  const pct=yearToIdx(Y)/IDX_MAX;
-  tlcur.style.left=(pct*100)+'%';
-  cursLbl.style.left=(pct*100)+'%';
-  cursLbl.textContent=Y<0?(-Y)+' a.C.':Y+' d.C.';
-  cursLbl.classList.toggle('r',pct>0.93);
-  cursLbl.classList.toggle('l',pct<0.05);
-  if(fogRect){const x=pct*TLW;fogRect.setAttribute('x',x);fogRect.setAttribute('width',Math.max(0,TLW-x));}
-}
-function renderAlive(Y){
-  const alive=PEOPLE.filter(p=>Y>=p.b&&Y<p.d&&catOn[p.cat]).sort((a,b)=>a.b-b.b||a.id-b.id);
-  aliveNum.textContent=alive.length;
-  aliveList.innerHTML=alive.length
-    ?alive.map(p=>'<button class="chip cat-'+p.cat+'" data-p="'+p.id+'"><span class="cd"></span>'+p.n+'</button>').join('')
-    :'<div class="none">Nessuna vita in quest\u2019anno.</div>';
-}
-function evHTML(e,anim){
-  const p=e.p;
-  const yTxt=e.t==='d'?(p.dLab||fmtY(p.d,p.dc)):fmtY(p.b,p.bc);
-  const icon=e.t==='b'?'<span class="ev-i b"></span>':'<span class="ev-i d">\u2020</span>';
-  const verb=e.t==='b'?'nasce a':'muore a';
-  return '<button class="ev'+(anim?' new':'')+'" data-cat="'+p.cat+'" data-p="'+p.id+'">'+icon+
-    '<span class="ev-t"><b>'+p.n+'</b> '+verb+' '+(e.t==='b'?p.bp:p.dp)+'</span>'+
-    '<span class="ev-y">'+yTxt+'</span></button>';
-}
-function updateFeed(Y,animate){
-  const vis=EVENTS.filter(e=>e.y<=Y&&catOn[e.p.cat]);
-  evCount.textContent=vis.length+' eventi';
-  const evs=vis.slice(-26);
-  if(!animate||lastFeedY===null||Y<=lastFeedY||Y-lastFeedY>2){
-    feedEl.innerHTML=evs.slice().reverse().map(e=>evHTML(e,false)).join('');
-  }else{
-    const fresh=EVENTS.filter(e=>e.y>lastFeedY&&e.y<=Y&&catOn[e.p.cat]);
-    if(fresh.length){
-      feedEl.insertAdjacentHTML('afterbegin',fresh.slice().reverse().map(e=>evHTML(e,true)).join(''));
-      while(feedEl.children.length>26)feedEl.lastElementChild.remove();
-    }
-  }
-  lastFeedY=Y;
-}
-function showChapter(e){
-  chapN.textContent=e.name;
-  chapR.textContent=e.range;
-  chap.classList.remove('show');void chap.offsetWidth;chap.classList.add('show');
-}
-function updateHUD(Y,mode){
-  yNum.textContent=Math.abs(Y);
-  yEra.textContent=Y<0?'a.C.':'d.C.';
-  yNum.classList.remove('tick');void yNum.offsetWidth;
-  if(byYear.has(Y))yNum.classList.add('tick');
-  const en=eraOf(Y);
-  if(en.name!==curEra){
-    curEra=en.name;
-    eraEl.textContent=en.name;
-    eraEl.classList.remove('swap');void eraEl.offsetWidth;eraEl.classList.add('swap');
-    eName2.textContent=en.name;eRange.textContent=en.range;eTxt.textContent=en.txt;
-    eraInner.classList.remove('swap');void eraInner.offsetWidth;eraInner.classList.add('swap');
-  }
-  renderAlive(Y);
-  updateCursor(Y);
-  updateFeed(Y,mode==='anim');
-  if(cardP)renderCard();
-}
-function setYear(Y){
-  Y=Math.max(YEAR_MIN,Math.min(YEAR_MAX,Y));
-  const pe=curYear===null?null:eraOf(curYear);
-  const prev=curYear;
-  const delta=prev===null?99:Math.abs(Y-prev);
-  const mode=(playing||(delta<=2&&!dragActive))?'anim':'seek';
-  if(pe&&pe!==eraOf(Y)&&(playing||delta>6))showChapter(eraOf(Y));
-  curYear=Y;yearF=Y;
-  updateWorld(Y,mode);
-  updateHUD(Y,mode);
-}
-
-/* ================== SCHEDA PERSONA ================== */
-const EXT='<svg viewBox="0 0 24 24" width="11" height="11"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const XS='<svg viewBox="0 0 24 24" width="14" height="14"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-function renderCard(){
-  const p=cardP;if(!p)return;
-  const Y=curYear;
-  const aliveNow=Y>=p.b&&Y<p.d;
-  const col=CATS[p.cat].color;
-  const status=aliveNow
-    ?'<span class="st" style="color:'+col+'"><span class="stdot"></span>In vita in quest\u2019anno</span>'
-    :(Y<p.b
-      ?'<span class="st dim">Non ancora nato · nasce nel '+fmtY(p.b,p.bc)+'</span>'
-      :'<span class="st dim">\u2020 Scomparso nel '+(p.dLab||fmtY(p.d,p.dc))+' · '+p.dp+'</span>');
-  const X=y=>6+yearToIdx(y)/IDX_MAX*256;
-  const cur=X(Y);
-  cardEl.innerHTML=
-   '<div class="card-head"><span class="card-cat" style="color:'+col+'">'+p.role.toUpperCase()+'</span>'+
-     '<button class="card-x" id="cardX" title="Chiudi (Esc)">'+XS+'</button></div>'+
-   '<h2 class="card-name">'+p.n+'</h2>'+status+
-   '<div class="card-age">in vita circa '+ageOf(p)+' anni</div>'+
-   '<div class="c-block"><span class="c-lbl">NASCITA</span>'+
-     '<div class="c-loc">'+p.bp+' <span class="c-yr">· '+fmtY(p.b,p.bc)+'</span></div>'+
-     '<a class="gmlink" href="'+gm(p.bla)+'" target="_blank" rel="noopener">'+EXT+' Google Maps</a></div>'+
-   '<div class="c-block"><span class="c-lbl">MORTE</span>'+
-     '<div class="c-loc">'+p.dp+' <span class="c-yr">· '+(p.dLab||fmtY(p.d,p.dc))+'</span></div>'+
-     '<a class="gmlink" href="'+gm(p.dla)+'" target="_blank" rel="noopener">'+EXT+' Google Maps</a></div>'+
-   '<div class="c-block"><span class="c-lbl">LA VITA SULLA LINEA DEL TEMPO</span>'+
-     '<svg class="lf" viewBox="0 0 268 34" id="lfSvg">'+
-       '<line x1="6" y1="24" x2="262" y2="24" class="lf-track"/>'+
-       '<line x1="'+X(p.b)+'" y1="24" x2="'+X(p.d)+'" y2="24" stroke="'+col+'" stroke-width="3.5" stroke-linecap="round"/>'+
-       '<circle cx="'+X(p.b)+'" cy="24" r="3.4" fill="'+col+'"/>'+
-       '<circle cx="'+X(p.d)+'" cy="24" r="3.4" fill="none" stroke="'+col+'" stroke-width="1.6"/>'+
-       '<line x1="'+cur+'" y1="15" x2="'+cur+'" y2="31" stroke-width="1.3" class="lf-cur"/>'+
-       '<text x="'+Math.min(256,Math.max(12,cur))+'" y="10" text-anchor="middle" class="lf-txt">'+
-         (Y<0?(-Y)+' a.C.':Y+' d.C.')+'</text>'+
-     '</svg>'+
-     '<div class="lf-hint">clicca sulla linea per spostarti nel tempo</div></div>';
-  cardEl.querySelector('#cardX').onclick=closeCard;
-  cardEl.querySelector('#lfSvg').addEventListener('pointerdown',e=>{
-    const r=e.currentTarget.getBoundingClientRect();
-    let idx=Math.round(((e.clientX-r.left)/r.width*268-6)/256*IDX_MAX);
-    idx=Math.max(0,Math.min(IDX_MAX,idx));
-    stopPlay();setYear(idxToYear(idx));
-    e.stopPropagation();
-  });
-}
-function openCard(p){
-  if(document.body.classList.contains('theater')){
-    toast(p.n+' · '+fmtY(p.b,p.bc)+' \u2013 '+(p.dLab||fmtY(p.d,p.dc))+' · premi M per i dettagli');
-    return;
-  }
-  cardP=p;cardEl.classList.add('open');rightEl.style.display='none';renderCard();
-}
-function closeCard(){cardP=null;cardEl.classList.remove('open');rightEl.style.display='';}
-
-/* ================== TIMELINE DELLE VITE ================== */
-const CENTS=[[-50,'50 a.C.'],[1,'1 d.C.'],[50,'50'],[100,'100'],[150,'150'],[200,'200'],[250,'250'],[300,'300'],[350,'350'],[400,'400']];
-const NS='http://www.w3.org/2000/svg';
-const svgEl=t=>document.createElementNS(NS,t);
-let fogRect=null,TLW=600;
-function renderTL(){
-  const W=tl.clientWidth||600,H=tl.clientHeight-16;
-  TLW=W;
-  tlsvg.setAttribute('viewBox','0 0 '+W+' '+H);
-  while(tlsvg.firstChild)tlsvg.removeChild(tlsvg.firstChild);
-  CENTS.forEach(([y])=>{
-    const x=yearToIdx(y)/IDX_MAX*W;
-    const l=svgEl('line');
-    l.setAttribute('x1',x);l.setAttribute('x2',x);l.setAttribute('y1',0);l.setAttribute('y2',H);
-    l.setAttribute('class','grid');tlsvg.appendChild(l);
-  });
-  const vis=PEOPLE.filter(p=>catOn[p.cat])
-    .sort((a,b)=>CATORD[a.cat]-CATORD[b.cat]||a.b-b.b||a.id-b.id);
-  const rowH=(H-10)/Math.max(1,vis.length);
-  vis.forEach((p,i)=>{
-    const y=5+i*rowH+rowH/2;
-    const x1=yearToIdx(p.b)/IDX_MAX*W,x2=yearToIdx(p.d)/IDX_MAX*W;
-    const g=svgEl('g');g.dataset.p=p.id;
-    const mk=(x1,x2,st,wd,extra)=>{
-      const l=svgEl('line');
-      l.setAttribute('x1',x1);l.setAttribute('x2',x2);l.setAttribute('y1',y);l.setAttribute('y2',y);
-      l.setAttribute('stroke',st);l.setAttribute('stroke-width',wd);
-      if(extra)l.setAttribute(extra[0],extra[1]);
-      return l;
-    };
-    const hit=mk(x1,x2,'transparent',Math.max(8,rowH*3),['pointer-events','stroke']);
-    const life=mk(x1,x2,CATS[p.cat].color,Math.max(1.6,rowH*.8),['stroke-linecap','round']);
-    life.setAttribute('opacity','.92');
-    const c=svgEl('circle');
-    c.setAttribute('cx',x1);c.setAttribute('cy',y);c.setAttribute('r',Math.max(2.2,rowH*.62));
-    c.setAttribute('fill',CATS[p.cat].color);
-    g.append(hit,life,c);
-    g.addEventListener('pointerenter',e=>{if(!dragActive){tlsvg.classList.add('dim');showTip(p,e);}});
-    g.addEventListener('pointermove',e=>{if(!dragActive)moveTip(e);});
-    g.addEventListener('pointerleave',()=>{tlsvg.classList.remove('dim');tip.style.display='none';});
-    tlsvg.appendChild(g);
-  });
-  fogRect=svgEl('rect');
-  fogRect.setAttribute('y',0);fogRect.setAttribute('height',H);fogRect.setAttribute('class','fog');
-  tlsvg.appendChild(fogRect);
-  if(curYear!==null)updateCursor(curYear);
-}
-function buildHead(){
-  tlHead.querySelectorAll('span:not(#cursLbl)').forEach(s=>s.remove());
-  CENTS.forEach(([y,lab])=>{
-    const s=document.createElement('span');
-    s.textContent=lab;
-    s.style.left=(yearToIdx(y)/IDX_MAX*100)+'%';
-    if(y===400)s.classList.add('end');
-    tlHead.appendChild(s);
-  });
-}
-function showTip(p,e){
-  tip.innerHTML='<b>'+p.n+'</b><span>'+fmtY(p.b,p.bc)+' — '+(p.dLab||fmtY(p.d,p.dc))+' · '+p.role+'</span>';
-  tip.style.display='block';moveTip(e);
-}
-function moveTip(e){
-  tip.style.left=Math.min(window.innerWidth-tip.offsetWidth-12,e.clientX+16)+'px';
-  tip.style.top=Math.max(8,e.clientY-tip.offsetHeight-14)+'px';
-}
-
-/* drag / click sulla timeline */
-let dragTL=null;
-function seekFromX(clientX){
-  const r=tl.getBoundingClientRect();
-  let idx=Math.round((clientX-r.left)/r.width*IDX_MAX);
-  idx=Math.max(0,Math.min(IDX_MAX,idx));
-  setYear(idxToYear(idx));
-}
-tl.addEventListener('pointerdown',e=>{
-  tl.setPointerCapture(e.pointerId);
-  dragActive=true;
-  dragTL={x:e.clientX,moved:false,g:e.target.closest('g[data-p]')};
-  if(!dragTL.g){stopPlay();seekFromX(e.clientX);}
-});
-tl.addEventListener('pointermove',e=>{
-  if(!dragTL)return;
-  if(Math.abs(e.clientX-dragTL.x)>5)dragTL.moved=true;
-  if(dragTL.moved){stopPlay();seekFromX(e.clientX);tip.style.display='none';}
-});
-tl.addEventListener('pointerup',()=>{
-  if(dragTL&&!dragTL.moved&&dragTL.g)openCard(PEOPLE[+dragTL.g.dataset.p]);
-  dragTL=null;dragActive=false;
-});
-tl.addEventListener('pointercancel',()=>{dragTL=null;dragActive=false;});
-
-/* ================== RIPRODUZIONE ================== */
-const SPEEDS=[2.5,7,18];
-let SPEED=7,playing=false,yearF=YEAR_MIN,lastT=0;
-const PLAY_S='<svg viewBox="0 0 24 24" width="17" height="17"><path d="M7.5 4.5v15l13-7.5z" fill="currentColor"/></svg>';
-const PAUSE_S='<svg viewBox="0 0 24 24" width="17" height="17"><path d="M6.5 4.5h3.6v15H6.5zM13.9 4.5h3.6v15h-3.6z" fill="currentColor"/></svg>';
-const REW_S='<svg viewBox="0 0 24 24" width="15" height="15"><path d="M5.5 4.5h2.6v15H5.5z" fill="currentColor"/><path d="M20 4.8v14.4L9.5 12z" fill="currentColor"/></svg>';
-const SUN_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4L19 19M19 5l-1.6 1.6M6.6 17.4L5 19"/></svg>';
-const MOON_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 14.5A8.3 8.3 0 0 1 9.5 3.8a8.3 8.3 0 1 0 10.7 10.7z"/></svg>';
-const FRAME_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/></svg>';
-playBtn.innerHTML=PLAY_S;
- $('resetBtn').innerHTML=REW_S;
-const themeBtn=$('themeBtn'),theaterBtn=$('theaterBtn');
-theaterBtn.innerHTML=FRAME_S;
-function refreshThemeBtn(){
-  themeBtn.innerHTML=theme==='light'?MOON_S:SUN_S;
-  themeBtn.title=theme==='light'?'Torna alla notte (T)':'Pergamena: mappa chiara (T)';
-}
-refreshThemeBtn();
-function updatePlayBtn(){playBtn.innerHTML=playing?PAUSE_S:PLAY_S;playBtn.title=playing?'Pausa (spazio)':'Riproduci (spazio)';}
-function loop(t){
-  if(!playing)return;
-  const dt=Math.min(.05,(t-lastT)/1000);lastT=t;
-  const y=Math.floor(yearF);
-  const slow=(byYear.has(y)||byYear.has(y+1)||byYear.has(y+2))?0.42:1;
-  yearF+=SPEED*slow*dt;
-  if(yearF>=YEAR_MAX){setYear(YEAR_MAX);stopPlay();return;}
-  if(Math.floor(yearF)!==y)setYear(Math.floor(yearF));
-  requestAnimationFrame(loop);
-}
-function startPlay(){
-  if(curYear>=YEAR_MAX)setYear(YEAR_MIN);
-  playing=true;lastT=performance.now();updatePlayBtn();
-  requestAnimationFrame(loop);
-}
-function stopPlay(){if(!playing)return;playing=false;updatePlayBtn();}
-function togglePlay(){playing?stopPlay():startPlay();}
-playBtn.onclick=togglePlay;
- $('resetBtn').onclick=()=>{stopPlay();setYear(YEAR_MIN);};
-document.querySelectorAll('.speed button').forEach(b=>{
-  b.onclick=()=>{
-    SPEED=SPEEDS[+b.dataset.s];
-    document.querySelectorAll('.speed button').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on');
-  };
-});
-
-/* ================== TEMA: notte / pergamena ================== */
-function setTheme(t){
-  if(t===theme)return;
-  theme=t;
-  document.documentElement.classList.toggle('light',t==='light');
-  if(!usingFallback){
-    const old=tileLayer;
-    tileLayer=baseLayer();watchTiles(tileLayer);
-    tileLayer.addTo(map);map.removeLayer(old);
-  }
-  for(const k in CATS)CATS[k].color=PAL[t][k];
-  renderTL();
-  if(cardP)renderCard();
-  refreshThemeBtn();
-  try{localStorage.setItem('vr-theme',t);}catch(_){}
-}
-themeBtn.onclick=()=>setTheme(theme==='dark'?'light':'dark');
-
-/* ================== MODALITÀ "SOLO MAPPA" ================== */
-function toggleTheater(){
-  const on=document.body.classList.toggle('theater');
-  theaterBtn.classList.toggle('on',on);
-  if(on){
-    closeCard();
-    toast('Solo mappa · premi M o il pulsante per riavere l\u2019interfaccia');
-  }
-}
-theaterBtn.onclick=toggleTheater;
-
-/* ================== FILTRI E DELEGAZIONE ================== */
-const catOn={imp:true,poet:true,lit:true};
-document.querySelectorAll('.flt button').forEach(b=>{
-  b.onclick=()=>{
-    const c=b.dataset.cat;catOn[c]=!catOn[c];
-    b.classList.toggle('off',!catOn[c]);
-    renderTL();
-    updateWorld(curYear,'seek');
-    renderAlive(curYear);
-    updateFeed(curYear,false);
-  };
-});
-aliveList.addEventListener('click',e=>{
-  const c=e.target.closest('.chip');if(!c)return;
-  const p=PEOPLE[+c.dataset.p];
-  openCard(p);
-  map.flyTo(p._m?p._m.marker.getLatLng():p.bla,Math.max(map.getZoom(),6),{duration:1.1});
-});
-feedEl.addEventListener('click',e=>{
-  const b=e.target.closest('.ev');if(b)openCard(PEOPLE[+b.dataset.p]);
-});
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(b)b.blur();});
-
-/* ================== TASTIERA ================== */
-window.addEventListener('keydown',e=>{
-  if(introActive){if(e.key==='Enter'||e.code==='Space'){e.preventDefault();$('startBtn').click();}return;}
-  if(e.code==='Space'){e.preventDefault();togglePlay();}
-  else if(e.key==='ArrowRight'){e.preventDefault();stopPlay();setYear(curYear===-1?1:curYear+1);}
-  else if(e.key==='ArrowLeft'){e.preventDefault();stopPlay();setYear(curYear===1?-1:curYear-1);}
-  else if(e.key==='t'||e.key==='T'){setTheme(theme==='dark'?'light':'dark');}
-  else if(e.key==='m'||e.key==='M'){toggleTheater();}
-  else if(e.key==='Escape')closeCard();
-});
-
-/* ================== INTRO: diorama vivente sotto il vetro ================== */
-const DRIFT=[[[41.9,12.5],6],[[37.2,-5.4],5],[[45.4,10.6],5],[[39.5,20],5]];
-let driftTimer=null,driftI=0;
-function startDrift(){
-  const go=()=>{
-    if(!introActive)return;
-    const v=DRIFT[driftI++%DRIFT.length];
-    map.flyTo(v[0],v[1],{duration:8.5,easeLinearity:.22});
-  };
-  go();
-  driftTimer=setInterval(go,9200);
-}
-function stopDrift(){if(driftTimer){clearInterval(driftTimer);driftTimer=null;}}
-function hideIntro(){
-  if(!introActive)return;introActive=false;
-  stopDrift();
-  const iv=$('intro');iv.classList.add('hide');
-  setTimeout(()=>iv.style.display='none',950);
-}
- $('startBtn').onclick=()=>{
-  hideIntro();
-  map.flyToBounds(OVERVIEW,Object.assign({duration:1.7},OVERVIEW_PAD));
-  setTimeout(()=>setYear(YEAR_MIN),350);
-  setTimeout(startPlay,1600);
-};
- $('skipBtn').onclick=()=>{
-  hideIntro();
-  map.flyToBounds(OVERVIEW,Object.assign({duration:1.2},OVERVIEW_PAD));
-};
-
-/* ================== AVVIO: diorama all'anno 90 ================== */
-buildHead();renderTL();
-setYear(DIORAMA);
-startDrift();
-window.addEventListener('resize',()=>{renderTL();map.invalidateSize();});
 </script>
 </body>
 </html>
