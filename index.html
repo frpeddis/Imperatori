@@ -35,7 +35,9 @@ button{font-family:inherit}
  --tile-filter:grayscale(.28) sepia(.14) brightness(.92) saturate(.9);
  --c-imp:#eaa6c4; --c-poet:#a9d6ab; --c-lit:#ecc78f;
  --ev-imp:#efb9d0; --ev-poet:#bcdfbe; --ev-lit:#efd3a4;
- --intro-stroke:rgba(239,230,216,.05);
+ --intro-stroke:rgba(239,230,216,.06);
+ --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(20,16,12,.42) 0%,rgba(20,16,12,.78) 70%,rgba(20,16,12,.94) 100%);
+ --intro-ts:0 2px 22px rgba(0,0,0,.55);
  --chap-ts:0 2px 24px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.55);
 }
 :root.light{
@@ -57,7 +59,9 @@ button{font-family:inherit}
  --tile-filter:sepia(.42) saturate(.72) brightness(1.03) contrast(.96);
  --c-imp:#b25d84; --c-poet:#4e8a52; --c-lit:#b3822f;
  --ev-imp:#a5456e; --ev-poet:#3f7a44; --ev-lit:#8a6220;
- --intro-stroke:rgba(58,47,34,.08);
+ --intro-stroke:rgba(58,47,34,.09);
+ --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(243,235,219,.48) 0%,rgba(243,235,219,.84) 70%,rgba(243,235,219,.96) 100%);
+ --intro-ts:0 2px 22px rgba(90,72,48,.35);
  --chap-ts:0 0 0 rgba(0,0,0,0);
 }
 
@@ -167,9 +171,10 @@ button{font-family:inherit}
 .lf{width:100%;cursor:pointer;margin-top:2px}
 .lf-track{stroke:var(--line-strong);stroke-width:1.5}
 .lf-txt{font:600 8.5px 'IBM Plex Mono',monospace;fill:var(--ink)}
+.lf-cur{stroke:var(--ink)}
 .lf-hint{font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-muted);margin-top:4px;letter-spacing:.04em}
 
-/* ============ titolo di capitolo (cambio era) ============ */
+/* ============ titolo di capitolo ============ */
 #chap{position:fixed;left:0;right:0;top:33%;z-index:25;text-align:center;pointer-events:none;opacity:0}
 #chap.show{animation:chap 3.4s ease both}
 @keyframes chap{0%{opacity:0;transform:translateY(16px)}12%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0}}
@@ -183,18 +188,19 @@ button{font-family:inherit}
 #bottom{position:fixed;left:0;right:0;bottom:0;height:132px;z-index:30;display:flex;gap:16px;
  padding:0 18px;background:var(--bar);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
  border-top:1px solid var(--panel-line)}
-.controls{display:flex;flex-direction:column;justify-content:center;gap:9px;flex:none;width:140px}
-.c-row{display:flex;gap:8px;align-items:center}
+.controls{display:flex;flex-direction:column;justify-content:center;gap:9px;flex:none;width:158px}
+.c-row{display:flex;gap:6px;align-items:center}
 #playBtn{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:var(--accent-ink);
- display:grid;place-items:center;cursor:pointer;transition:transform .2s}
+ display:grid;place-items:center;cursor:pointer;transition:transform .2s;flex:none}
 #playBtn:hover{transform:scale(1.07)}
-.icon-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:none;
- color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;transition:.15s}
+.icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:none;
+ color:var(--ink-soft);cursor:pointer;display:grid;place-items:center;transition:.15s;flex:none}
 .icon-btn:hover{border-color:var(--hover-line);color:var(--ink)}
+.icon-btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .speed{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;width:max-content}
 .speed button{background:none;border:none;color:var(--ink-dim);font:500 10px 'IBM Plex Mono',monospace;padding:5px 10px;cursor:pointer;transition:.15s}
 .speed button.on{background:var(--chip-bg-strong);color:var(--ink)}
-.kbd-hint{font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-muted);letter-spacing:.06em}
+.kbd-hint{font:400 8.5px/1.6 'IBM Plex Mono',monospace;color:var(--ink-muted);letter-spacing:.04em}
 
 .tl{flex:1;position:relative;margin:12px 0 14px;cursor:ew-resize;touch-action:none;user-select:none}
 .tl-head{position:relative;height:16px;font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-faint);pointer-events:none}
@@ -214,11 +220,17 @@ button{font-family:inherit}
  pointer-events:none;box-shadow:0 0 9px var(--glow)}
 #tlcursor::after{content:'';position:absolute;top:0;left:-3.5px;width:8px;height:8px;background:var(--accent);transform:rotate(45deg)}
 
-/* ============ tooltip ============ */
+/* ============ tooltip + toast ============ */
 #tip{position:fixed;z-index:60;pointer-events:none;display:none;background:var(--tip-bg);
  border:1px solid var(--panel-line);padding:8px 11px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #tip b{display:block;font:italic 600 15px 'Fraunces'}
 #tip span{font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
+#toast{position:fixed;left:50%;bottom:152px;transform:translateX(-50%) translateY(10px);z-index:90;
+ background:var(--tip-bg);border:1px solid var(--panel-line);color:var(--ink-soft);
+ font:400 11px/1.4 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:9px 16px;border-radius:999px;
+ opacity:0;pointer-events:none;transition:opacity .35s ease,transform .35s ease;
+ white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ============ marker ============ */
 .mkhost{background:none;border:none;cursor:pointer}
@@ -282,8 +294,10 @@ button{font-family:inherit}
 .leaflet-control-scale-line{background:var(--attr-bg)!important;color:var(--ink-dim)!important;
  border:1px solid var(--line-strong)!important;border-top:none!important;font:400 9px 'IBM Plex Mono',monospace!important}
 
-/* ============ intro ============ */
-#intro{position:fixed;inset:0;z-index:2000;background:var(--bg);display:grid;place-items:center;text-align:center;transition:opacity .85s ease;overflow:hidden}
+/* ============ intro di vetro: la mappa si vede sotto ============ */
+#intro{position:fixed;inset:0;z-index:2000;background:var(--intro-glass);
+ backdrop-filter:blur(6px) saturate(.85);-webkit-backdrop-filter:blur(6px) saturate(.85);
+ display:grid;place-items:center;text-align:center;transition:opacity .85s ease;overflow:hidden}
 #intro.hide{opacity:0;pointer-events:none}
 .intro-bg{position:absolute;inset:0;display:grid;place-items:center;font:900 30vw 'Fraunces';
  color:transparent;-webkit-text-stroke:1px var(--intro-stroke);user-select:none;pointer-events:none}
@@ -293,8 +307,9 @@ button{font-family:inherit}
 .intro-inner h1{animation-delay:.12s}.intro-inner p{animation-delay:.26s}
 .intro-legend{animation-delay:.42s}.intro-btns{animation-delay:.56s}.intro-hint{animation-delay:.72s}
 @keyframes inup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-.intro-title{font:italic 600 clamp(52px,9vw,104px)/0.95 'Fraunces';margin:20px 0 24px}
-.intro-inner p{font-weight:300;font-size:17px;line-height:1.65;color:var(--ink-soft)}
+.intro-title{font:italic 600 clamp(52px,9vw,104px)/0.95 'Fraunces';margin:20px 0 24px;text-shadow:var(--intro-ts)}
+.intro-inner p{font-weight:300;font-size:17px;line-height:1.65;color:var(--ink-soft);text-shadow:var(--intro-ts)}
+.intro-inner .kicker,.intro-legend,.intro-hint{text-shadow:var(--intro-ts)}
 .intro-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:26px 0 32px;
  font:500 11px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
 .intro-legend .fdot{width:10px;height:10px}
@@ -305,7 +320,17 @@ button{font-family:inherit}
 .btn:hover{background:transparent;color:var(--accent)}
 .btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--line)}
 .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
-.intro-hint{margin-top:36px;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-muted);letter-spacing:.1em}
+.intro-hint{margin-top:36px;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);letter-spacing:.1em}
+
+/* ============ modalità "solo mappa" ============ */
+#hdr,#left,#right{transition:opacity .5s ease,transform .5s ease}
+body.theater #hdr{opacity:0;transform:translateY(-16px);pointer-events:none;visibility:hidden;
+ transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
+body.theater #left{opacity:0;transform:translateX(-20px);pointer-events:none;visibility:hidden;
+ transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
+body.theater #right{opacity:0;transform:translateX(20px);pointer-events:none;visibility:hidden;
+ transition:opacity .5s ease,transform .5s ease,visibility 0s linear .5s}
+body.theater #card{opacity:0;pointer-events:none}
 
 /* ============ responsive ============ */
 @media(max-width:1020px){
@@ -323,6 +348,7 @@ button{font-family:inherit}
  #left{display:none}
  #eraName{font-size:13px}
  .leaflet-bottom.leaflet-left{bottom:118px}
+ #toast{bottom:120px}
 }
 </style>
 </head>
@@ -360,8 +386,8 @@ button{font-family:inherit}
 </aside>
 
 <div id="yearBox">
-  <div class="big"><span id="yNum">70</span><span id="yEra">a.C.</span></div>
-  <div id="eraName">Gli ultimi anni della Repubblica</div>
+  <div class="big"><span id="yNum">90</span><span id="yEra">d.C.</span></div>
+  <div id="eraName">Dinastia flavia</div>
 </div>
 
 <aside id="right" class="panel">
@@ -383,12 +409,13 @@ button{font-family:inherit}
     <div class="c-row">
       <button id="playBtn" title="Riproduci / pausa (spazio)"></button>
       <button id="resetBtn" class="icon-btn" title="Torna al 70 a.C."></button>
-      <button id="themeBtn" class="icon-btn" title="Pergamena"></button>
+      <button id="theaterBtn" class="icon-btn" title="Solo mappa (M)"></button>
+      <button id="themeBtn" class="icon-btn" title="Pergamena (T)"></button>
     </div>
     <div class="speed">
       <button data-s="0">½×</button><button data-s="1" class="on">1×</button><button data-s="2">3×</button>
     </div>
-    <div class="kbd-hint">spazio · riproduci — ← → · anno — T · tema</div>
+    <div class="kbd-hint">spazio play · ← → anno · T tema · M mappa</div>
   </div>
   <div class="tl" id="tl">
     <div class="tl-head" id="tlHead"><span id="cursLbl"></span></div>
@@ -398,6 +425,7 @@ button{font-family:inherit}
 </div>
 
 <div id="tip"></div>
+<div id="toast"></div>
 <div id="grain"></div>
 
 <div id="intro">
@@ -405,10 +433,10 @@ button{font-family:inherit}
   <div class="intro-inner">
     <div class="kicker">Atlante temporale · 70 a.C. → 400 d.C.</div>
     <h1 class="intro-title">Vitae<br>Romanorum</h1>
-    <p>Trentotto vite — diciassette imperatori, dodici poeti, nove storici e letterati — attraverso
-       tredici età, dal tramonto della Repubblica alla spartizione dell'impero. Fai scorrere il tempo
-       e guarda il Mediterraneo popolarsi di nomi, e svuotarsi quando la storia li reclama: alla
-       scomparsa, ogni vita ricalca il suo ultimo viaggio, dalla città natale al luogo del congedo.</p>
+    <p>Dietro questo velo c'è già l'impero com'era nell'anno 90: undici vite in cammino fra Roma,
+       la Spagna e l'Asia. Trentotto destini — diciassette imperatori, dodici poeti, nove storici —
+       attraversano tredici età, dal tramonto della Repubblica alla spartizione dell'impero.
+       Alla scomparsa, ogni vita ricalca il suo ultimo viaggio, dalla città natale al luogo del congedo.</p>
     <div class="intro-legend">
       <span class="cat-imp"><span class="fdot"></span>Imperatori</span>
       <span class="cat-poet"><span class="fdot"></span>Poeti</span>
@@ -418,7 +446,7 @@ button{font-family:inherit}
       <button class="btn" id="startBtn">Inizia il viaggio</button>
       <button class="btn ghost" id="skipBtn">Esplora liberamente</button>
     </div>
-    <div class="intro-hint">SPAZIO riproduci · ← → un anno · T cambia tema · trascina la linea del tempo · clicca un nome</div>
+    <div class="intro-hint">SPAZIO riproduci · ← → un anno · M solo mappa · T tema · trascina la linea del tempo</div>
   </div>
 </div>
 
@@ -438,11 +466,7 @@ let theme='dark';
 try{if(localStorage.getItem('vr-theme')==='light')theme='light';}catch(_){}
 document.documentElement.classList.toggle('light',theme==='light');
 
-const CATS={
-  imp:{label:'Imperatori'},
-  poet:{label:'Poeti'},
-  lit:{label:'Storici e letterati'}
-};
+const CATS={imp:{label:'Imperatori'},poet:{label:'Poeti'},lit:{label:'Storici e letterati'}};
 for(const k in CATS)CATS[k].color=PAL[theme][k];
 const CATORD={imp:0,poet:1,lit:2};
 
@@ -518,7 +542,7 @@ const ERAS=[
  {s:395,name:'Occidente e Oriente divisi',
   txt:'Alla morte di Teodosio l\u2019impero non si ricongiungerà mai più: Onorio a Ravenna, Arcadio a Costantinopoli. Roma, saccheggiata da Alarico nel 410, esce dal centro della storia.'},
 ];
-const YEAR_MIN=-70,YEAR_MAX=400;
+const YEAR_MIN=-70,YEAR_MAX=400,DIORAMA=90;
 const fmtY=(y,c)=>(c?'c. ':'')+(y<0?(-y)+' a.C.':y+' d.C.');
 ERAS.forEach((e,i)=>{
   e.end=i<ERAS.length-1?ERAS[i+1].s-1:YEAR_MAX;
@@ -539,10 +563,34 @@ EVENTS.sort((a,b)=>a.y-b.y||(a.t===b.t?0:a.t==='b'?-1:1));
 const byYear=new Map();
 EVENTS.forEach(e=>{if(!byYear.has(e.y))byYear.set(e.y,[]);byYear.get(e.y).push(e);});
 
-/* ================== MAPPA ================== */
+/* ================== MAPPA (con riserva automatica sui tile) ================== */
+const OVERVIEW=[[29,-12],[51,39]];
+const OVERVIEW_PAD={paddingTopLeft:L.point(310,120),paddingBottomRight:L.point(330,160)};
 const map=L.map('map',{zoomControl:false,minZoom:3,maxZoom:18,keyboard:false});
-let tileLayer=L.tileLayer(URLS[theme],{subdomains:'abcd',maxZoom:19,attribution:ATTR}).addTo(map);
-map.fitBounds([[29,-12],[51,39]],{paddingTopLeft:L.point(310,120),paddingBottomRight:L.point(330,160)});
+
+let tileLayer=null,usingFallback=false,fallArmed=false,errCount=0;
+function baseLayer(){
+  return usingFallback
+    ?L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
+      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})
+    :L.tileLayer(URLS[theme],{subdomains:'abcd',maxZoom:19,attribution:ATTR});
+}
+function watchTiles(layer){
+  layer.on('tileerror',()=>{
+    if(usingFallback)return;
+    errCount++;
+    if(errCount>=8&&!fallArmed){
+      fallArmed=true;usingFallback=true;
+      const old=tileLayer;
+      tileLayer=baseLayer();watchTiles(tileLayer);
+      tileLayer.addTo(map);map.removeLayer(old);
+      toast('Tile CARTO non raggiungibili · passo a OpenStreetMap');
+    }
+  });
+  layer.on('tileload',()=>{if(errCount>0)errCount--;});
+}
+tileLayer=baseLayer();watchTiles(tileLayer);tileLayer.addTo(map);
+map.fitBounds(OVERVIEW,OVERVIEW_PAD);
 L.control.zoom({position:'bottomleft'}).addTo(map);
 L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
 
@@ -744,6 +792,13 @@ const yNum=$('yNum'),yEra=$('yEra'),eraEl=$('eraName'),feedEl=$('feed'),evCount=
       eName2=$('eName2'),eRange=$('eRange'),eTxt=$('eTxt'),eraInner=$('eraInner');
 let curYear=null,curEra='',cardP=null,lastFeedY=null,introActive=true,dragActive=false;
 
+let toastT=null;
+function toast(msg){
+  const t=$('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
 function updateCursor(Y){
   const pct=yearToIdx(Y)/IDX_MAX;
   tlcur.style.left=(pct*100)+'%';
@@ -851,7 +906,7 @@ function renderCard(){
        '<line x1="'+X(p.b)+'" y1="24" x2="'+X(p.d)+'" y2="24" stroke="'+col+'" stroke-width="3.5" stroke-linecap="round"/>'+
        '<circle cx="'+X(p.b)+'" cy="24" r="3.4" fill="'+col+'"/>'+
        '<circle cx="'+X(p.d)+'" cy="24" r="3.4" fill="none" stroke="'+col+'" stroke-width="1.6"/>'+
-       '<line x1="'+cur+'" y1="15" x2="'+cur+'" y2="31" stroke="currentColor" stroke-width="1.3" class="lf-cur"/>'+
+       '<line x1="'+cur+'" y1="15" x2="'+cur+'" y2="31" stroke-width="1.3" class="lf-cur"/>'+
        '<text x="'+Math.min(256,Math.max(12,cur))+'" y="10" text-anchor="middle" class="lf-txt">'+
          (Y<0?(-Y)+' a.C.':Y+' d.C.')+'</text>'+
      '</svg>'+
@@ -866,6 +921,10 @@ function renderCard(){
   });
 }
 function openCard(p){
+  if(document.body.classList.contains('theater')){
+    toast(p.n+' · '+fmtY(p.b,p.bc)+' \u2013 '+(p.dLab||fmtY(p.d,p.dc))+' · premi M per i dettagli');
+    return;
+  }
   cardP=p;cardEl.classList.add('open');rightEl.style.display='none';renderCard();
 }
 function closeCard(){cardP=null;cardEl.classList.remove('open');rightEl.style.display='';}
@@ -969,12 +1028,14 @@ const PAUSE_S='<svg viewBox="0 0 24 24" width="17" height="17"><path d="M6.5 4.5
 const REW_S='<svg viewBox="0 0 24 24" width="15" height="15"><path d="M5.5 4.5h2.6v15H5.5z" fill="currentColor"/><path d="M20 4.8v14.4L9.5 12z" fill="currentColor"/></svg>';
 const SUN_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4L19 19M19 5l-1.6 1.6M6.6 17.4L5 19"/></svg>';
 const MOON_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 14.5A8.3 8.3 0 0 1 9.5 3.8a8.3 8.3 0 1 0 10.7 10.7z"/></svg>';
+const FRAME_S='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/></svg>';
 playBtn.innerHTML=PLAY_S;
  $('resetBtn').innerHTML=REW_S;
-const themeBtn=$('themeBtn');
+const themeBtn=$('themeBtn'),theaterBtn=$('theaterBtn');
+theaterBtn.innerHTML=FRAME_S;
 function refreshThemeBtn(){
   themeBtn.innerHTML=theme==='light'?MOON_S:SUN_S;
-  themeBtn.title=theme==='light'?'Torna alla notte':'Pergamena: mappa chiara';
+  themeBtn.title=theme==='light'?'Torna alla notte (T)':'Pergamena: mappa chiara (T)';
 }
 refreshThemeBtn();
 function updatePlayBtn(){playBtn.innerHTML=playing?PAUSE_S:PLAY_S;playBtn.title=playing?'Pausa (spazio)':'Riproduci (spazio)';}
@@ -1010,9 +1071,11 @@ function setTheme(t){
   if(t===theme)return;
   theme=t;
   document.documentElement.classList.toggle('light',t==='light');
-  const old=tileLayer;
-  tileLayer=L.tileLayer(URLS[t],{subdomains:'abcd',maxZoom:19,attribution:ATTR}).addTo(map);
-  map.removeLayer(old);
+  if(!usingFallback){
+    const old=tileLayer;
+    tileLayer=baseLayer();watchTiles(tileLayer);
+    tileLayer.addTo(map);map.removeLayer(old);
+  }
   for(const k in CATS)CATS[k].color=PAL[t][k];
   renderTL();
   if(cardP)renderCard();
@@ -1020,6 +1083,17 @@ function setTheme(t){
   try{localStorage.setItem('vr-theme',t);}catch(_){}
 }
 themeBtn.onclick=()=>setTheme(theme==='dark'?'light':'dark');
+
+/* ================== MODALITÀ "SOLO MAPPA" ================== */
+function toggleTheater(){
+  const on=document.body.classList.toggle('theater');
+  theaterBtn.classList.toggle('on',on);
+  if(on){
+    closeCard();
+    toast('Solo mappa · premi M o il pulsante per riavere l\u2019interfaccia');
+  }
+}
+theaterBtn.onclick=toggleTheater;
 
 /* ================== FILTRI E DELEGAZIONE ================== */
 const catOn={imp:true,poet:true,lit:true};
@@ -1051,22 +1125,44 @@ window.addEventListener('keydown',e=>{
   else if(e.key==='ArrowRight'){e.preventDefault();stopPlay();setYear(curYear===-1?1:curYear+1);}
   else if(e.key==='ArrowLeft'){e.preventDefault();stopPlay();setYear(curYear===1?-1:curYear-1);}
   else if(e.key==='t'||e.key==='T'){setTheme(theme==='dark'?'light':'dark');}
+  else if(e.key==='m'||e.key==='M'){toggleTheater();}
   else if(e.key==='Escape')closeCard();
 });
 
-/* ================== INTRO ================== */
- $('startBtn').onclick=()=>{hideIntro();setTimeout(startPlay,700);};
- $('skipBtn').onclick=hideIntro;
+/* ================== INTRO: diorama vivente sotto il vetro ================== */
+const DRIFT=[[[41.9,12.5],6],[[37.2,-5.4],5],[[45.4,10.6],5],[[39.5,20],5]];
+let driftTimer=null,driftI=0;
+function startDrift(){
+  const go=()=>{
+    if(!introActive)return;
+    const v=DRIFT[driftI++%DRIFT.length];
+    map.flyTo(v[0],v[1],{duration:8.5,easeLinearity:.22});
+  };
+  go();
+  driftTimer=setInterval(go,9200);
+}
+function stopDrift(){if(driftTimer){clearInterval(driftTimer);driftTimer=null;}}
 function hideIntro(){
   if(!introActive)return;introActive=false;
+  stopDrift();
   const iv=$('intro');iv.classList.add('hide');
   setTimeout(()=>iv.style.display='none',950);
 }
+ $('startBtn').onclick=()=>{
+  hideIntro();
+  map.flyToBounds(OVERVIEW,Object.assign({duration:1.7},OVERVIEW_PAD));
+  setTimeout(()=>setYear(YEAR_MIN),350);
+  setTimeout(startPlay,1600);
+};
+ $('skipBtn').onclick=()=>{
+  hideIntro();
+  map.flyToBounds(OVERVIEW,Object.assign({duration:1.2},OVERVIEW_PAD));
+};
 
-/* ================== AVVIO ================== */
-curYear=YEAR_MIN;
+/* ================== AVVIO: diorama all'anno 90 ================== */
 buildHead();renderTL();
-setYear(YEAR_MIN);
+setYear(DIORAMA);
+startDrift();
 window.addEventListener('resize',()=>{renderTL();map.invalidateSize();});
 </script>
 </body>
