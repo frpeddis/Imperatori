@@ -8,7 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ onerror="this.onerror=null;var l=document.createElement('link');l.rel='stylesheet';l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';document.head.appendChild(l);"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
@@ -34,10 +35,11 @@ button{font-family:inherit}
  --vig:rgba(6,4,3,.5); --grain-op:.04;
  --c-imp:#eaa6c4; --c-poet:#a9d6ab; --c-lit:#ecc78f;
  --ev-imp:#efb9d0; --ev-poet:#bcdfbe; --ev-lit:#efd3a4;
+ --reign:#c04545; /* rosso del trono (tema notte) */
  --intro-stroke:rgba(239,230,216,.06);
  --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(20,16,12,.30) 0%,rgba(20,16,12,.66) 68%,rgba(20,16,12,.9) 100%);
  --intro-ts:0 2px 22px rgba(0,0,0,.55);
- --chap-ts:0 2px 24px rgba(0,0,0,.75),0 1px 3px rgba(0,0,0,.55);
+ --chap-ts:0 2px 18px rgba(0,0,0,.7);
  --stem:rgba(239,230,216,.5);
 }
 :root.light{
@@ -58,10 +60,11 @@ button{font-family:inherit}
  --vig:rgba(122,96,62,.14); --grain-op:.03;
  --c-imp:#b25d84; --c-poet:#4e8a52; --c-lit:#b3822f;
  --ev-imp:#a5456e; --ev-poet:#3f7a44; --ev-lit:#8a6220;
+ --reign:#7e1515; /* rosso scuro (pergamena) */
  --intro-stroke:rgba(58,47,34,.09);
  --intro-glass:radial-gradient(120% 95% at 50% 42%,rgba(243,235,219,.38) 0%,rgba(243,235,219,.72) 68%,rgba(243,235,219,.92) 100%);
  --intro-ts:0 2px 22px rgba(90,72,48,.35);
- --chap-ts:0 0 0 rgba(0,0,0,0);
+ --chap-ts:0 1px 10px rgba(90,72,48,.28);
  --stem:rgba(58,47,34,.45);
 }
 .cat-imp{--c:var(--c-imp)}.cat-poet{--c:var(--c-poet)}.cat-lit{--c:var(--c-lit)}
@@ -89,10 +92,49 @@ button{font-family:inherit}
 #yNum{font-weight:900;font-size:66px;display:inline-block}
 #yNum.tick{animation:yTick .5s ease}
 @keyframes yTick{30%{transform:scale(1.12)}}
+/* flash rosso all'incoronazione */
+#yearBox.rf #yNum{animation:yFlash 1.5s ease}
+#yearBox.rf #yEra{animation:yFlash 1.5s ease}
+@keyframes yFlash{
+ 0%,100%{color:var(--ink);text-shadow:none;transform:scale(1)}
+ 8%,28%,48%{color:var(--reign);text-shadow:0 0 22px color-mix(in srgb,var(--reign) 60%,transparent);transform:scale(1.1)}
+ 18%,38%,62%{color:var(--ink);text-shadow:none;transform:scale(1)}
+}
 #yEra{font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--ink-dim);margin-left:7px;vertical-align:8px}
 #eraName{font-style:italic;font-weight:300;font-size:16px;color:var(--ink-soft);margin-top:5px}
 .swap{animation:eraswap .65s ease both}
 @keyframes eraswap{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* ============ ANNUNCI EVENTI ============ */
+#ann{position:fixed;left:50%;transform:translateX(-50%);top:108px;z-index:24;
+ display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
+ width:max-content;max-width:min(92vw,600px)}
+.ann{display:flex;align-items:center;gap:11px;background:var(--panel);
+ backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px);
+ border:1px solid var(--panel-line);border-radius:999px;padding:9px 20px;
+ box-shadow:0 8px 28px rgba(0,0,0,.4);animation:annIn .55s cubic-bezier(.2,1.25,.3,1) both}
+.ann.out{animation:annOut .45s ease both}
+@keyframes annIn{from{opacity:0;transform:translateY(-16px) scale(.9)}to{opacity:1;transform:none}}
+@keyframes annOut{to{opacity:0;transform:translateY(-12px) scale(.94)}}
+.ann .a-ic{display:grid;place-items:center;flex:none}
+.ann .a-dot{width:11px;height:11px;border-radius:50%;display:block;box-shadow:0 0 8px var(--ic,#888)}
+.ann.r .a-ic{color:var(--reign)}
+.ann.d .a-ic{font:600 20px 'Fraunces';color:var(--ink-soft)}
+.ann .a-n{font:700 16px 'Fraunces';letter-spacing:.01em;white-space:nowrap}
+.ann.r .a-n{color:var(--reign)}
+.ann .a-t{font:italic 300 14px 'Fraunces';color:var(--ink-soft);white-space:nowrap}
+.ann .a-y{font:500 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);margin-left:4px;white-space:nowrap}
+
+/* ============ TITOLO DI CAPITOLO: in alto, rosso scuro ============ */
+#chap{position:fixed;left:50%;transform:translateX(-50%);top:12px;z-index:26;text-align:center;
+ pointer-events:none;opacity:0;max-width:min(46vw,540px)}
+#chap.show{animation:chap 3.6s ease both}
+@keyframes chap{0%{opacity:0;transform:translate(-50%,-10px)}10%{opacity:1;transform:translate(-50%,0)}80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-6px)}}
+#chap .k{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.38em;color:var(--reign);opacity:.85}
+#chap .n{font:italic 600 clamp(19px,2.6vw,30px)/1.15 'Fraunces';margin:7px 0 5px;color:var(--reign);text-shadow:var(--chap-ts)}
+#chap .r{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--reign);opacity:.8;text-shadow:var(--chap-ts)}
+#chap .rule{width:46px;height:1px;background:var(--reign);margin:10px auto 0;position:relative;opacity:.85}
+#chap .rule::after{content:'';position:absolute;left:50%;top:-3px;width:7px;height:7px;background:var(--reign);transform:translateX(-50%) rotate(45deg)}
 
 /* ============ colonna sinistra ============ */
 #left{position:fixed;left:22px;top:128px;z-index:20;width:252px;padding:14px;display:flex;flex-direction:column;gap:14px;
@@ -106,6 +148,9 @@ button{font-family:inherit}
 .flt button.off{opacity:.35}
 .fdot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
 .flt .cnt{margin-left:auto;color:var(--ink-faint)}
+.flt-note{display:flex;gap:8px;align-items:flex-start;margin-top:9px;font:300 11px/1.5 'Fraunces';color:var(--ink-dim)}
+.flt-note .crown{color:var(--reign);flex:none;margin-top:1px}
+.flt-note b{color:var(--reign);font-weight:600}
 #aliveHead{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
 #aliveNum{font:600 24px 'Fraunces';color:var(--ink)}
 #aliveHead .t{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.2em;color:var(--ink-faint)}
@@ -115,6 +160,7 @@ button{font-family:inherit}
  font:500 11px 'IBM Plex Mono',monospace;color:var(--ink);cursor:pointer;transition:.15s}
 .chip:hover{border-color:var(--c)}
 .chip .cd{width:6px;height:6px;border-radius:50%;background:var(--c)}
+.chip.reigning{border-color:var(--reign)}
 .none{font-style:italic;font-weight:300;color:var(--ink-faint);font-size:13px}
 #eraBlock .e-name{font:italic 600 17px 'Fraunces';line-height:1.18}
 #eraBlock .e-range{font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.16em;color:var(--ink-faint);margin-top:4px;text-transform:uppercase}
@@ -126,6 +172,9 @@ button{font-family:inherit}
  padding-bottom:10px;border-bottom:1px solid var(--panel-line);display:flex;justify-content:space-between;align-items:baseline}
 .panel-title .cnt{letter-spacing:.05em}
 #feed{flex:1;overflow-y:auto;padding-top:8px;display:flex;flex-direction:column;gap:1px}
+.ev-sep{display:flex;align-items:center;gap:8px;margin:8px 2px 4px;color:var(--ink-faint);
+ font:500 9px 'IBM Plex Mono',monospace;letter-spacing:.2em}
+.ev-sep::before,.ev-sep::after{content:'';height:1px;background:var(--line);flex:1;opacity:.7}
 .ev{display:flex;align-items:baseline;gap:8px;padding:6px 6px;border:none;background:none;color:var(--ink-soft);
  font:400 12.5px 'Fraunces';text-align:left;cursor:pointer;width:100%;border-radius:6px;transition:background .15s}
 .ev:hover{background:var(--chip-bg)}
@@ -133,8 +182,10 @@ button{font-family:inherit}
 .ev .ev-i{flex:none;font:500 11px 'IBM Plex Mono',monospace;align-self:center}
 .ev .ev-i.b{width:8px;height:8px;border-radius:50%}
 .ev .ev-i.d{color:var(--ink-faint)}
+.ev .ev-i.r{display:inline-flex;color:var(--reign)}
 .ev .ev-y{margin-left:auto;flex:none;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-faint)}
 .ev[data-cat=imp] b{color:var(--ev-imp)}.ev[data-cat=poet] b{color:var(--ev-poet)}.ev[data-cat=lit] b{color:var(--ev-lit)}
+.ev.ev-r b{color:var(--reign)}
 .ev[data-cat=imp] .ev-i.b{background:var(--c-imp)}.ev[data-cat=poet] .ev-i.b{background:var(--c-poet)}.ev[data-cat=lit] .ev-i.b{background:var(--c-lit)}
 .ev.new{animation:evin .5s cubic-bezier(.2,1,.3,1) both}
 @keyframes evin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
@@ -148,7 +199,8 @@ button{font-family:inherit}
 .card-x{margin-left:auto;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);
  background:none;color:var(--ink-dim);cursor:pointer;display:grid;place-items:center;transition:.15s;flex:none}
 .card-x:hover{color:var(--ink);border-color:var(--hover-line)}
-.card-name{font:italic 600 30px 'Fraunces';line-height:1.05;margin:10px 0 6px}
+.card-name{font:italic 600 30px 'Fraunces';line-height:1.05;margin:10px 0 6px;display:flex;align-items:center;gap:10px}
+.card-name .crown{flex:none}
 .st{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.08em}
 .st.dim{color:var(--ink-faint);font-style:italic;font-family:'Fraunces';font-weight:300;font-size:13px;letter-spacing:0}
 .st .stdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px;animation:pulse 2.6s ease-out infinite}
@@ -158,6 +210,9 @@ button{font-family:inherit}
 .c-lbl{font:600 9px 'IBM Plex Mono',monospace;letter-spacing:.22em;color:var(--ink-faint);display:block;margin-bottom:5px}
 .c-loc{font-size:16px;font-weight:500}
 .c-yr{font:400 12px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
+.regn{display:flex;align-items:center;gap:8px}
+.regn .crown{color:var(--reign)}
+.regn.on{color:var(--reign)}
 .gmlink{display:inline-flex;align-items:center;gap:5px;font:500 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);
  text-decoration:none;border:1px solid var(--line);padding:4px 9px;border-radius:999px;margin-top:9px;transition:.15s}
 .gmlink:hover{color:var(--ink);border-color:var(--hover-line)}
@@ -167,15 +222,8 @@ button{font-family:inherit}
 .lf-cur{stroke:var(--ink)}
 .lf-hint{font:400 9px 'IBM Plex Mono',monospace;color:var(--ink-muted);margin-top:4px;letter-spacing:.04em}
 
-/* ============ titolo di capitolo ============ */
-#chap{position:fixed;left:0;right:0;top:33%;z-index:25;text-align:center;pointer-events:none;opacity:0}
-#chap.show{animation:chap 3.4s ease both}
-@keyframes chap{0%{opacity:0;transform:translateY(16px)}12%{opacity:1;transform:none}78%{opacity:1}100%{opacity:0}}
-#chap .k{font:500 10px 'IBM Plex Mono',monospace;letter-spacing:.4em;color:var(--ink-dim)}
-#chap .n{font:italic 600 clamp(30px,4.6vw,54px)/1.1 'Fraunces';margin:12px 0 10px;text-shadow:var(--chap-ts)}
-#chap .r{font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.22em;color:var(--ink-dim)}
-#chap .rule{width:64px;height:1px;background:var(--ink-dim);margin:16px auto 0;position:relative;opacity:.8}
-#chap .rule::after{content:'';position:absolute;left:50%;top:-3px;width:7px;height:7px;background:var(--accent);transform:translateX(-50%) rotate(45deg)}
+/* ============ corona rossa (solo durante il regno) ============ */
+.crown{color:var(--reign);filter:drop-shadow(0 0 4px color-mix(in srgb,var(--reign) 55%,transparent));flex:none;display:inline-block;vertical-align:middle}
 
 /* ============ barra inferiore ============ */
 #bottom{position:fixed;left:0;right:0;bottom:0;height:132px;z-index:30;display:flex;gap:16px;
@@ -191,7 +239,7 @@ button{font-family:inherit}
 .icon-btn:hover{border-color:var(--hover-line);color:var(--ink)}
 .icon-btn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .speed{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;width:max-content}
-.speed button{background:none;border:none;color:var(--ink-dim);font:500 10px 'IBM Plex Mono',monospace;padding:5px 10px;cursor:pointer;transition:.15s}
+.speed button{background:none;border:none;color:var(--ink-dim);font:500 10px 'IBM Plex Mono',monospace;padding:5px 8px;cursor:pointer;transition:.15s}
 .speed button.on{background:var(--chip-bg-strong);color:var(--ink)}
 .kbd-hint{font:400 8.5px/1.6 'IBM Plex Mono',monospace;color:var(--ink-muted);letter-spacing:.03em}
 .tl{flex:1;position:relative;margin:12px 0 14px;cursor:ew-resize;touch-action:none;user-select:none}
@@ -208,6 +256,7 @@ button{font-family:inherit}
 #tlsvg.dim g{opacity:.13}
 #tlsvg.dim g:hover{opacity:1}
 #tlsvg .fog{fill:var(--fog);pointer-events:none}
+#tlsvg .tick{opacity:.8}
 #tlcursor{position:absolute;top:10px;bottom:0;width:1px;background:var(--accent);
  pointer-events:none;box-shadow:0 0 9px var(--glow)}
 #tlcursor::after{content:'';position:absolute;top:0;left:-3.5px;width:8px;height:8px;background:var(--accent);transform:rotate(45deg)}
@@ -218,6 +267,9 @@ button{font-family:inherit}
 #tip b{display:block;font:italic 600 15px 'Fraunces';margin-bottom:3px}
 #tip .ttr{display:flex;align-items:center;gap:6px;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-soft)}
 #tip .ttr::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--c);flex:none}
+#tip .ttr.crowned::before{display:none}
+#tip .ttr.crowned .crown{margin-right:2px}
+#tip .ttr.goldrow{color:var(--reign)}
 #toast{position:fixed;left:50%;bottom:152px;transform:translateX(-50%) translateY(10px);z-index:90;
  background:var(--tip-bg);border:1px solid var(--panel-line);color:var(--ink-soft);
  font:400 11px/1.4 'IBM Plex Mono',monospace;letter-spacing:.04em;padding:9px 16px;border-radius:999px;
@@ -246,6 +298,16 @@ button{font-family:inherit}
  font:600 12.5px 'Fraunces';padding:1px 8px;border-radius:6px;cursor:pointer;text-align:left;
  white-space:nowrap;text-shadow:var(--mk-ts)}
 button.cm-row:hover{background:var(--chip-bg-strong)}
+/* imperatori: nome più grande; ENORME quando regna */
+.cm-row.is-imp{font-size:14px;font-weight:700;transition:font-size .3s ease}
+.cm-row.is-imp.reigning{font-size:17px}
+.cm-row.is-imp .nm{display:inline-block}
+.cm-row.is-imp.reigning .nm.nm-pop{animation:nmPop .65s cubic-bezier(.2,1.6,.35,1)}
+@keyframes nmPop{0%{transform:scale(.9)}40%{transform:scale(1.3)}100%{transform:scale(1)}}
+.cm-row.reigning .crown{animation:crownIn .5s cubic-bezier(.2,1.5,.35,1) both}
+@keyframes crownIn{0%{transform:scale(0) rotate(-25deg)}60%{transform:scale(1.25) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+.cm-rgn{font:500 9.5px 'IBM Plex Mono',monospace;color:var(--ink-faint);letter-spacing:.03em;font-weight:400}
+.cm-row.reigning .cm-rgn{color:var(--reign);font-weight:600}
 .cm-rd{width:7px;height:7px;border-radius:50%;background:var(--c);flex:none}
 .cm-row.fresh{animation:rowIn .55s cubic-bezier(.2,1.4,.3,1) both}
 @keyframes rowIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
@@ -306,7 +368,7 @@ button.cm-row:hover{background:var(--chip-bg-strong)}
 .intro-inner p{font-weight:300;font-size:17px;line-height:1.65;color:var(--ink-soft);text-shadow:var(--intro-ts)}
 .intro-inner .kicker,.intro-legend,.intro-hint{text-shadow:var(--intro-ts)}
 .intro-legend{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:26px 0 32px;
- font:500 11px 'IBM Plex Mono',monospace;color:var(--ink-dim)}
+ font:500 11px 'IBM Plex Mono',monospace;color:var(--ink-dim);align-items:center}
 .intro-legend .fdot{width:10px;height:10px}
 .intro-legend span{display:inline-flex;align-items:center;gap:8px}
 .intro-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
@@ -316,6 +378,13 @@ button.cm-row:hover{background:var(--chip-bg-strong)}
 .btn.ghost{background:transparent;color:var(--ink-soft);border-color:var(--line)}
 .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
 .intro-hint{margin-top:36px;font:400 10px 'IBM Plex Mono',monospace;color:var(--ink-dim);letter-spacing:.1em}
+
+/* ============ errore di caricamento ============ */
+#fatal{position:fixed;inset:0;z-index:3000;display:none;place-items:center;background:var(--bg);text-align:center;padding:24px}
+#fatal .fi{max-width:460px}
+#fatal h2{font:italic 600 26px 'Fraunces';margin-bottom:14px}
+#fatal p{font:300 14.5px/1.6 'Fraunces';color:var(--ink-soft)}
+#fatal .btn{margin-top:22px}
 
 /* ============ solo mappa ============ */
 #hdr,#left,#right{transition:opacity .5s ease,transform .5s ease}
@@ -336,6 +405,8 @@ body.theater #card{opacity:0;pointer-events:none}
  .kbd-hint{display:none}
  #aliveList{max-height:88px}
  #card{left:12px;right:12px;width:auto;top:auto;bottom:150px;max-height:48vh}
+ #ann{top:96px}
+ #chap{max-width:min(60vw,420px)}
 }
 @media(max-width:640px){
  #bottom{height:104px}
@@ -344,6 +415,11 @@ body.theater #card{opacity:0;pointer-events:none}
  #eraName{font-size:13px}
  .leaflet-bottom.leaflet-left{bottom:118px}
  #toast{bottom:120px}
+ #ann{top:86px}
+ .ann{padding:7px 14px;gap:8px}
+ .ann .a-t{font-size:12.5px}
+ .ann .a-n{font-size:14px}
+ #chap{top:8px;max-width:88vw}
 }
 </style>
 </head>
@@ -365,6 +441,7 @@ body.theater #card{opacity:0;pointer-events:none}
       <button class="cat-poet" data-cat="poet"><span class="fdot"></span>Poeti<span class="cnt">12</span></button>
       <button class="cat-lit" data-cat="lit"><span class="fdot"></span>Storici e letterati<span class="cnt">9</span></button>
     </div>
+    <div class="flt-note" id="fltNote"></div>
   </div>
   <div>
     <div id="aliveHead"><span id="aliveNum">0</span><span class="t">VITE IN QUEST'ANNO</span></div>
@@ -392,6 +469,8 @@ body.theater #card{opacity:0;pointer-events:none}
 
 <section id="card" class="panel"></section>
 
+<div id="ann"></div>
+
 <div id="chap">
   <div class="k">CAPITOLO</div>
   <div class="n" id="chapN"></div>
@@ -405,11 +484,11 @@ body.theater #card{opacity:0;pointer-events:none}
       <button id="playBtn" title="Riproduci / pausa (spazio)"></button>
       <button id="resetBtn" class="icon-btn" title="Torna al 70 a.C."></button>
       <button id="theaterBtn" class="icon-btn" title="Solo mappa (M)"></button>
-      <button id="baseBtn" class="icon-btn" title="Cambia mappa: notte / pergamena / satellite (B)"></button>
+      <button id="baseBtn" class="icon-btn" title="Cambia mappa: pergamena / notte / satellite (B)"></button>
       <button id="themeBtn" class="icon-btn" title="Notte / Pergamena (T)"></button>
     </div>
     <div class="speed">
-      <button data-s="0">½×</button><button data-s="1" class="on">1×</button><button data-s="2">3×</button>
+      <button data-s="0">¼×</button><button data-s="1" class="on">½×</button><button data-s="2">1×</button><button data-s="3">3×</button>
     </div>
     <div class="kbd-hint">spazio play · ← → anno · B mappa · T tema · M solo mappa</div>
   </div>
@@ -424,6 +503,17 @@ body.theater #card{opacity:0;pointer-events:none}
 <div id="toast"></div>
 <div id="grain"></div>
 
+<div id="fatal">
+  <div class="fi">
+    <div class="kicker">Problema di rete</div>
+    <h2>La libreria della mappa non si è caricata</h2>
+    <p>Non sono riuscito a scaricare Leaflet da nessun CDN (unpkg, cdnjs, jsDelivr).
+       L'app ha bisogno di una connessione a internet per mappa e font: controlla la rete,
+       disattiva eventuali filtri o prova un altro browser, poi ricarica.</p>
+    <button class="btn" onclick="location.reload()">Riprova</button>
+  </div>
+</div>
+
 <div id="intro">
   <div class="intro-bg">SPQR</div>
   <div class="intro-inner">
@@ -431,12 +521,15 @@ body.theater #card{opacity:0;pointer-events:none}
     <h1 class="intro-title">Vitae<br>Romanorum</h1>
     <p>Sotto questo velo la mappa è già viva: è l'anno 90, undici destini in cammino fra Roma, la Spagna
        e l'Asia. Trentotto vite — diciassette imperatori, dodici poeti, nove storici — attraversano tredici
-       età, dal tramonto della Repubblica alla spartizione dell'impero. Alla scomparsa di ognuno, un segno
-       luminoso ripercorre il suo ultimo viaggio, dalla città natale al luogo del congedo.</p>
+       età. Ogni nascita, incoronazione e morte viene annunciata mentre scorre il tempo: la
+       <em>corona rossa</em> compare accanto al nome di un imperatore solo negli anni del suo regno,
+       e in quel momento il suo nome cresce e l'anno lampeggia. Alla scomparsa, chi è partito
+       ricalca l'ultimo viaggio con un arco; chi non ha mai lasciato la città natale, un cerchio tratteggiato.</p>
     <div class="intro-legend">
       <span class="cat-imp"><span class="fdot"></span>Imperatori</span>
       <span class="cat-poet"><span class="fdot"></span>Poeti</span>
       <span class="cat-lit"><span class="fdot"></span>Storici e letterati</span>
+      <span id="legCrown"></span>
     </div>
     <div class="intro-btns">
       <button class="btn" id="startBtn">Inizia il viaggio</button>
@@ -446,9 +539,16 @@ body.theater #card{opacity:0;pointer-events:none}
   </div>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ================== DATI ================== */
+function boot(){
+/* ==================================================================
+   CHIAVE API (dichiarata, non usata: i servizi di mappa qui sotto
+   sono tutti gratuiti e senza chiave). Formati noti per confronto:
+   Google 'AIza…' · Mapbox 'pk./sk.'. Dimmi il provider e la collego.
+================================================================== */
+const API_KEY='cb1_2iig_1_d169071945493f6dafe467bb';
+
+/* ================== PALETTE / CATEGORIE ================== */
 const PAL={
   dark:{imp:'#eaa6c4',poet:'#a9d6ab',lit:'#ecc78f'},
   light:{imp:'#b25d84',poet:'#4e8a52',lit:'#b3822f'}
@@ -456,44 +556,55 @@ const PAL={
 const CATS={imp:{label:'Imperatori'},poet:{label:'Poeti'},lit:{label:'Storici e letterati'}};
 const CATORD={imp:0,poet:1,lit:2};
 
+/* ================== CORONA ROSSA (SVG disegnata) ================== */
+function crownSVG(s){
+  return '<svg class="crown" viewBox="0 0 32 27" width="'+s+'" height="'+Math.round(s*27/32)+'" aria-hidden="true">'+
+    '<path d="M4.5 19.5 L4.5 9 L10.8 14 L16 4.5 L21.2 14 L27.5 9 L27.5 19.5 Z" fill="currentColor" stroke="rgba(0,0,0,.28)" stroke-width="1" stroke-linejoin="round"/>'+
+    '<rect x="4.5" y="20.5" width="23" height="4.5" rx="1.4" fill="currentColor" stroke="rgba(0,0,0,.28)" stroke-width="1"/>'+
+    '<circle cx="16" cy="3.4" r="2.1" fill="currentColor"/>'+
+    '<circle cx="4.5" cy="8" r="1.7" fill="currentColor"/>'+
+    '<circle cx="27.5" cy="8" r="1.7" fill="currentColor"/></svg>';
+}
+
+/* ================== DATI (r:[inizio,fine] = anni di regno) ================== */
 const PEOPLE=[
  {n:'Virgilio',cat:'poet',role:'Poeta',b:-70,bc:0,bp:'Andes · Mantova',bla:[45.1167,10.8167],d:-19,dc:0,dp:'Brundisium · Brindisi',dla:[40.6384,17.9463]},
  {n:'Orazio',cat:'poet',role:'Poeta',b:-65,bc:0,bp:'Venusia · Venosa',bla:[40.9625,15.8153],d:-8,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Augusto',cat:'imp',role:'Imperatore',b:-63,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:14,dc:0,dp:'Nola',dla:[40.9258,14.5294]},
+ {n:'Augusto',cat:'imp',role:'Imperatore',b:-63,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:14,dc:0,dp:'Nola',dla:[40.9258,14.5294],r:[-27,14]},
  {n:'Tito Livio',cat:'lit',role:'Storico',b:-59,bc:0,bp:'Patavium · Padova',bla:[45.4064,11.8768],d:17,dc:0,dp:'Patavium · Padova',dla:[45.4064,11.8768]},
  {n:'Properzio',cat:'poet',role:'Poeta',b:-50,bc:1,bp:'Asisium · Assisi',bla:[43.0707,12.6196],d:-15,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
  {n:'Tibullo',cat:'poet',role:'Poeta',b:-50,bc:1,bp:'Pedum · Gallicano nel Lazio',bla:[41.8697,12.8239],d:-19,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
  {n:'Ovidio',cat:'poet',role:'Poeta',b:-43,bc:0,bp:'Sulmo · Sulmona',bla:[42.0483,13.9253],d:17,dc:0,dLab:'17/18 d.C.',dp:'Tomis · Costanza (Romania)',dla:[44.1792,28.6498]},
- {n:'Tiberio',cat:'imp',role:'Imperatore',b:-42,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:37,dc:0,dp:'Misenum · Miseno',dla:[40.7850,14.0847]},
+ {n:'Tiberio',cat:'imp',role:'Imperatore',b:-42,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:37,dc:0,dp:'Misenum · Miseno',dla:[40.7850,14.0847],r:[14,37]},
  {n:'Fedro',cat:'poet',role:'Favolista',b:-15,bc:1,bp:'Pydna · Grecia',bla:[40.3922,22.6133],d:50,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Claudio',cat:'imp',role:'Imperatore',b:-10,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:54,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
+ {n:'Claudio',cat:'imp',role:'Imperatore',b:-10,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:54,dc:0,dp:'Roma',dla:[41.8902,12.4922],r:[41,54]},
  {n:'Seneca il Giovane',cat:'lit',role:'Filosofo e drammaturgo',b:-4,bc:0,bp:'Corduba · Cordova',bla:[37.8882,-4.7794],d:65,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Caligola',cat:'imp',role:'Imperatore',b:12,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:41,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
+ {n:'Caligola',cat:'imp',role:'Imperatore',b:12,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:41,dc:0,dp:'Roma',dla:[41.8902,12.4922],r:[37,41]},
  {n:'Plinio il Vecchio',cat:'lit',role:'Scienziato e scrittore',b:23,bc:0,bp:'Novum Comum · Como',bla:[45.8103,9.0863],d:79,dc:0,dp:'Stabiae · Castellammare di Stabia',dla:[40.6974,14.4827]},
  {n:'Persio',cat:'poet',role:'Poeta satirico',b:34,bc:0,bp:'Volaterrae · Volterra',bla:[43.4025,10.8606],d:62,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
  {n:'Quintiliano',cat:'lit',role:'Retore',b:35,bc:1,bp:'Calagurris · Calahorra',bla:[42.3045,-1.9644],d:96,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Nerone',cat:'imp',role:'Imperatore',b:37,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:68,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
+ {n:'Nerone',cat:'imp',role:'Imperatore',b:37,bc:0,bp:'Antium · Anzio',bla:[41.4474,12.6282],d:68,dc:0,dp:'Roma',dla:[41.8902,12.4922],r:[54,68]},
  {n:'Lucano',cat:'poet',role:'Poeta',b:39,bc:0,bp:'Corduba · Cordova',bla:[37.8882,-4.7794],d:65,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Tito',cat:'imp',role:'Imperatore',b:39,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:81,dc:0,dp:"Aquae Cutiliae · Castel Sant'Angelo",dla:[42.3800,13.0167]},
+ {n:'Tito',cat:'imp',role:'Imperatore',b:39,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:81,dc:0,dp:"Aquae Cutiliae · Castel Sant'Angelo",dla:[42.3800,13.0167],r:[79,81]},
  {n:'Marziale',cat:'poet',role:'Poeta epigrammatico',b:40,bc:1,bp:'Bilbilis · Calatayud',bla:[41.3532,-1.6441],d:104,dc:1,dp:'Bilbilis · Calatayud',dla:[41.3532,-1.6441]},
  {n:'Stazio',cat:'poet',role:'Poeta',b:45,bc:1,bp:'Neapolis · Napoli',bla:[40.8518,14.2681],d:96,dc:1,dp:'Neapolis · Napoli',dla:[40.8518,14.2681]},
- {n:'Domiziano',cat:'imp',role:'Imperatore',b:51,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:96,dc:0,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Traiano',cat:'imp',role:'Imperatore',b:53,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:117,dc:0,dp:'Selinus · Gazipaşa (Turchia)',dla:[36.2625,32.3167]},
+ {n:'Domiziano',cat:'imp',role:'Imperatore',b:51,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:96,dc:0,dp:'Roma',dla:[41.8902,12.4922],r:[81,96]},
+ {n:'Traiano',cat:'imp',role:'Imperatore',b:53,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:117,dc:0,dp:'Selinus · Gazipaşa (Turchia)',dla:[36.2625,32.3167],r:[98,117]},
  {n:'Giovenale',cat:'poet',role:'Poeta satirico',b:55,bc:1,bp:'Aquinum · Aquino',bla:[41.4939,13.7042],d:127,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
  {n:'Tacito',cat:'lit',role:'Storico',b:56,bc:1,bp:'Interamna Nahars · Terni',bla:[42.5636,12.6483],d:120,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
  {n:'Plinio il Giovane',cat:'lit',role:'Epistolografo',b:61,bc:0,bp:'Novum Comum · Como',bla:[45.8103,9.0863],d:113,dc:0,dp:'Bitinia · İzmit',dla:[40.7350,29.9310]},
  {n:'Svetonio',cat:'lit',role:'Biografo',b:70,bc:1,bp:'Ostia Antica · Roma',bla:[41.7587,12.2908],d:126,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:'Adriano',cat:'imp',role:'Imperatore',b:76,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:138,dc:0,dp:'Baiae · Bacoli',dla:[40.8167,14.0833]},
- {n:'Antonino Pio',cat:'imp',role:'Imperatore',b:86,bc:0,bp:'Lanuvium · Lanuvio',bla:[41.6756,12.6983],d:161,dc:0,dp:'Lorium · Castel di Guido',dla:[41.8978,12.2783]},
- {n:'Marco Aurelio',cat:'imp',role:'Imperatore e filosofo',b:121,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:180,dc:0,dp:'Vindobona · Vienna',dla:[48.2082,16.3738]},
+ {n:'Adriano',cat:'imp',role:'Imperatore',b:76,bc:0,bp:'Italica · Santiponce',bla:[37.4439,-6.0461],d:138,dc:0,dp:'Baiae · Bacoli',dla:[40.8167,14.0833],r:[117,138]},
+ {n:'Antonino Pio',cat:'imp',role:'Imperatore',b:86,bc:0,bp:'Lanuvium · Lanuvio',bla:[41.6756,12.6983],d:161,dc:0,dp:'Lorium · Castel di Guido',dla:[41.8978,12.2783],r:[138,161]},
+ {n:'Marco Aurelio',cat:'imp',role:'Imperatore e filosofo',b:121,bc:0,bp:'Roma',bla:[41.8902,12.4922],d:180,dc:0,dp:'Vindobona · Vienna',dla:[48.2082,16.3738],r:[161,180]},
  {n:'Apuleio',cat:'lit',role:'Romanziere',b:124,bc:1,bp:'Madaurus · Algeria',bla:[36.0744,7.8208],d:170,dc:1,dp:'Cartagine · Tunisi',dla:[36.8528,10.3233]},
- {n:'Settimio Severo',cat:'imp',role:'Imperatore',b:145,bc:0,bp:'Leptis Magna · Libia',bla:[32.6378,14.2981],d:211,dc:0,dp:'Eburacum · York',dla:[53.9591,-1.0815]},
- {n:'Caracalla',cat:'imp',role:'Imperatore',b:188,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:217,dc:0,dp:'Carrhae · Harran',dla:[36.8647,39.0308]},
- {n:'Diocleziano',cat:'imp',role:'Imperatore',b:244,bc:0,bp:'Salona · Solino',bla:[43.5381,16.4839],d:311,dc:0,dp:'Spalatum · Spalato',dla:[43.5081,16.4402]},
- {n:'Costantino I',cat:'imp',role:'Imperatore',b:272,bc:0,bp:'Naissus · Niš',bla:[43.3209,21.8958],d:337,dc:0,dp:'Nicomedia · İzmit',dla:[40.7656,29.9406]},
+ {n:'Settimio Severo',cat:'imp',role:'Imperatore',b:145,bc:0,bp:'Leptis Magna · Libia',bla:[32.6378,14.2981],d:211,dc:0,dp:'Eburacum · York',dla:[53.9591,-1.0815],r:[193,211]},
+ {n:'Caracalla',cat:'imp',role:'Imperatore',b:188,bc:0,bp:'Lugdunum · Lione',bla:[45.7640,4.8357],d:217,dc:0,dp:'Carrhae · Harran',dla:[36.8647,39.0308],r:[198,217]},
+ {n:'Diocleziano',cat:'imp',role:'Imperatore',b:244,bc:0,bp:'Salona · Solino',bla:[43.5381,16.4839],d:311,dc:0,dp:'Spalatum · Spalato',dla:[43.5081,16.4402],r:[284,305],abd:1},
+ {n:'Costantino I',cat:'imp',role:'Imperatore',b:272,bc:0,bp:'Naissus · Niš',bla:[43.3209,21.8958],d:337,dc:0,dp:'Nicomedia · İzmit',dla:[40.7656,29.9406],r:[306,337]},
  {n:'Ammiano Marcellino',cat:'lit',role:'Storico',b:330,bc:1,bp:'Antiochia · Antakya',bla:[36.2021,36.1604],d:397,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
- {n:"Giuliano l'Apostata",cat:'imp',role:'Imperatore e scrittore',b:331,bc:0,bp:'Costantinopoli · Istanbul',bla:[41.0082,28.9784],d:363,dc:0,dp:'Samarra · Iraq',dla:[34.1983,43.8742]},
- {n:'Teodosio I',cat:'imp',role:'Imperatore',b:347,bc:0,bp:'Cauca · Coca',bla:[41.2161,-4.5236],d:395,dc:0,dp:'Mediolanum · Milano',dla:[45.4642,9.1900]},
+ {n:"Giuliano l'Apostata",cat:'imp',role:'Imperatore e scrittore',b:331,bc:0,bp:'Costantinopoli · Istanbul',bla:[41.0082,28.9784],d:363,dc:0,dp:'Samarra · Iraq',dla:[34.1983,43.8742],r:[361,363]},
+ {n:'Teodosio I',cat:'imp',role:'Imperatore',b:347,bc:0,bp:'Cauca · Coca',bla:[41.2161,-4.5236],d:395,dc:0,dp:'Mediolanum · Milano',dla:[45.4642,9.1900],r:[379,395]},
  {n:'Claudiano',cat:'poet',role:'Poeta',b:370,bc:1,bp:"Alessandria d'Egitto",bla:[31.2001,29.9187],d:404,dc:1,dp:'Roma',dla:[41.8902,12.4922]},
 ];
 PEOPLE.forEach((p,i)=>p.id=i);
@@ -523,30 +634,59 @@ const yearToIdx=y=>y<0?y+70:y+69;
 const IDX_MAX=yearToIdx(400);
 const gm=ll=>'https://www.google.com/maps?q='+ll[0]+','+ll[1];
 const ageOf=p=>p.b<0&&p.d>0?(p.d-p.b-1):(p.d-p.b);
+const isReigning=(p,Y)=>!!p.r&&Y>=p.r[0]&&Y<=p.r[1];
+function fmtReign(a,b,short){
+  const A=a<0?(-a)+' a.C.':''+a;
+  return A+'\u2013'+b+(short?'':' d.C.');
+}
 
+/* ================== EVENTI ================== */
 const EVENTS=[];
-PEOPLE.forEach(p=>{EVENTS.push({y:p.b,t:'b',p},{y:p.d,t:'d',p});});
-EVENTS.sort((a,b)=>a.y-b.y||(a.t===b.t?0:a.t==='b'?-1:1));
+PEOPLE.forEach(p=>{
+  EVENTS.push({y:p.b,t:'b',p},{y:p.d,t:'d',p});
+  if(p.r)EVENTS.push({y:p.r[0],t:'r',p});
+});
+const EVORD={b:0,r:1,d:2};
+EVENTS.sort((a,b)=>a.y-b.y||EVORD[a.t]-EVORD[b.t]||a.p.id-b.p.id);
 const byYear=new Map();
 EVENTS.forEach(e=>{if(!byYear.has(e.y))byYear.set(e.y,[]);byYear.get(e.y).push(e);});
 
-/* ================== MAPPA + BASEMAPPE (tutte gratuite, senza chiavi) ================== */
+/* ================== DOM / STATO ================== */
+const $=id=>document.getElementById(id);
+const yNum=$('yNum'),yEra=$('yEra'),eraEl=$('eraName'),feedEl=$('feed'),evCount=$('evCount'),
+      aliveNum=$('aliveNum'),aliveList=$('aliveList'),tlcur=$('tlcursor'),cursLbl=$('cursLbl'),
+      tl=$('tl'),tlsvg=$('tlsvg'),tlHead=$('tlHead'),tip=$('tip'),
+      cardEl=$('card'),rightEl=$('right'),playBtn=$('playBtn'),
+      chap=$('chap'),chapN=$('chapN'),chapR=$('chapR'),
+      eName2=$('eName2'),eRange=$('eRange'),eTxt=$('eTxt'),eraInner=$('eraInner'),
+      annHost=$('ann'),yearBoxEl=$('yearBox');
+let curYear=null,curEra='',cardP=null,lastFeedY=null,introActive=true,dragActive=false,rfT=null;
+
+let toastT=null;
+function toast(msg){
+  const t=$('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ================== BASEMAPPE ================== */
+const PERG_FILTER='sepia(.35) saturate(.6) brightness(1.03) contrast(.97)';
+const OSM_ATTR='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 const BASEMAPS=[
- {id:'light',name:'Pergamena',pal:'light',filter:'sepia(.3) saturate(.66) brightness(1.02) contrast(.98)',
-  url:'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',sub:'abcd',
-  attr:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
- {id:'dark',name:'Notte',pal:'dark',filter:'saturate(.92)',
+ {id:'perg',name:'Pergamena',pal:'light',filter:PERG_FILTER,
+  url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',sub:'abc',attr:OSM_ATTR},
+ {id:'notte',name:'Notte',pal:'dark',filter:'saturate(.9)',
   url:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',sub:'abcd',
   attr:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'},
  {id:'sat',name:'Satellite',pal:'dark',filter:'none',
   url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',sub:'abc',
   attr:'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'},
 ];
-let bmId='light';
+let bmId='perg';
 try{
   const s=localStorage.getItem('vr-basemap');
-  if(s&&BASEMAPS.some(b=>b.id===s))bmId=s;
-  else if(localStorage.getItem('vr-theme')==='dark')bmId='dark';
+  const MAP={light:'perg',dark:'notte',sat:'sat',perg:'perg',notte:'notte'};
+  if(s&&MAP[s])bmId=MAP[s];
 }catch(_){}
 
 const OVERVIEW=[[30,-11],[47,38]];
@@ -557,33 +697,55 @@ let theme=BASEMAPS.find(b=>b.id===bmId).pal;
 for(const k in CATS)CATS[k].color=PAL[theme][k];
 document.documentElement.classList.toggle('light',theme==='light');
 
-let tileLayer=null,usingFallback=false,fallArmed=false,errCount=0;
-function fallbackLayer(){
-  return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,
-    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
+let tileLayer=null,errCount=0,fbStage=0,gaveUp=false;
+function fallbackConfig(){
+  if(fbStage===0)return{
+    name:'OpenStreetMap',
+    url:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',sub:'abc',
+    filter:theme==='dark'?'grayscale(.85) invert(.92) brightness(.9) contrast(.9) sepia(.3)':PERG_FILTER,
+    attr:OSM_ATTR};
+  if(fbStage===1)return{
+    name:'CARTO Voyager',
+    url:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',sub:'abcd',
+    filter:theme==='dark'?'grayscale(.75) invert(.9) brightness(.92)':'sepia(.28) saturate(.75)',
+    attr:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'};
+  return null;
+}
+function applyTiles(cfg,name){
+  const old=tileLayer;
+  tileLayer=L.tileLayer(cfg.url,{subdomains:cfg.sub,maxZoom:19,attribution:cfg.attr});
+  watchTiles(tileLayer);
+  tileLayer.addTo(map);
+  if(old)map.removeLayer(old);
+  document.documentElement.style.setProperty('--tile-filter',cfg.filter);
+  if(name)toast('Tile non raggiungibili · passo a '+name);
 }
 function watchTiles(layer){
   layer.on('tileerror',()=>{
-    if(usingFallback)return;
-    if(++errCount>=8&&!fallArmed){
-      fallArmed=true;usingFallback=true;
-      const old=tileLayer;
-      tileLayer=fallbackLayer();watchTiles(tileLayer);
-      tileLayer.addTo(map);map.removeLayer(old);
-      toast('Tile non raggiungibili · passo a OpenStreetMap');
+    if(gaveUp)return;
+    if(++errCount>=6){
+      fbStage++;
+      const fb=fallbackConfig();
+      if(fb)applyTiles(fb,fb.name);
+      else{gaveUp=true;toast('Nessun provider di mappe raggiungibile · controlla la connessione');}
+      errCount=0;
     }
   });
   layer.on('tileload',()=>{if(errCount>0)errCount--;});
 }
-tileLayer=L.tileLayer(BASEMAPS.find(b=>b.id===bmId).url,{subdomains:BASEMAPS.find(b=>b.id===bmId).sub,maxZoom:19,
-  attribution:BASEMAPS.find(b=>b.id===bmId).attr});
-watchTiles(tileLayer);tileLayer.addTo(map);
-document.documentElement.style.setProperty('--tile-filter',BASEMAPS.find(b=>b.id===bmId).filter);
+(function initTiles(){
+  const bm=BASEMAPS.find(b=>b.id===bmId);
+  tileLayer=L.tileLayer(bm.url,{subdomains:bm.sub,maxZoom:19,attribution:bm.attr});
+  watchTiles(tileLayer);
+  tileLayer.addTo(map);
+  document.documentElement.style.setProperty('--tile-filter',bm.filter);
+})();
 map.fitBounds(OVERVIEW,OVERVIEW_PAD);
 L.control.zoom({position:'bottomleft'}).addTo(map);
 L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
 
-/* ================== CITTÀ: punto esatto + etichette anti-collisione ================== */
+/* ================== CITTÀ ================== */
+let zTop=2000;
 const cities=new Map();
 const cityKeyOf=p=>p.bla[0].toFixed(3)+','+p.bla[1].toFixed(3);
 
@@ -607,7 +769,7 @@ function makeCity(key,latlng){
   const city={key,latlng,people:[],ghost:[],fx:[],_pendingDeaths:0,_removing:false,_rt:null,_sig:'',
     R:6,w:0,h:0,lay:{hidden:true,dx:0,dy:0}};
   city.marker=L.marker(latlng,{icon:L.divIcon({className:'cmhost',iconSize:[0,0]}),
-    keyboard:false,riseOnHover:true,zIndexOffset:10}).addTo(map);
+    keyboard:false,riseOnHover:true,zIndexOffset:zTop++}).addTo(map);
   city.marker.getElement().innerHTML=
     '<div class="cm"><span class="cm-stem"></span>'+
     '<span class="cm-hit"><span class="cm-dot"></span><span class="cm-pulse"></span></span>'+
@@ -628,8 +790,20 @@ function makeCity(key,latlng){
   return city;
 }
 
+/* riga: corona + nome grande SOLO mentre regna (con pop all'ascesa) */
+function rowHTML(p,fresh){
+  if(p.cat==='imp'){
+    const on=isReigning(p,curYear);
+    return '<button class="cm-row cat-imp is-imp'+(fresh?' fresh':'')+(on?' reigning':'')+'" data-p="'+p.id+'">'+
+      (on?crownSVG(17):'')+'<span class="nm'+(p._crownFresh?' nm-pop':'')+'">'+p.n+'</span>'+
+      '<span class="cm-rgn">'+fmtReign(p.r[0],p.r[1],true)+'</span></button>';
+  }
+  return '<button class="cm-row cat-'+p.cat+(fresh?' fresh':'')+'" data-p="'+p.id+'"><span class="cm-rd"></span>'+p.n+'</button>';
+}
+
 function renderCityLabel(city){
   const ps=city.people,gh=city.ghost;
+  city.marker.setZIndexOffset(zTop++);
   const R=5.5+Math.min(Math.max(ps.length-1,0),4)*0.75;
   city.R=R;
   const dot=city.els.dot;
@@ -644,13 +818,13 @@ function renderCityLabel(city){
   badge.textContent=ps.length;
   badge.style.left=(R-2)+'px';badge.style.top=(-R-9)+'px';
   const rows=[];
-  ps.forEach(p=>rows.push('<button class="cm-row cat-'+p.cat+(p._fresh?' fresh':'')+'" data-p="'+p.id+'"><span class="cm-rd"></span>'+p.n+'</button>'));
-  gh.forEach(g=>rows.push('<div class="cm-row leaving cat-'+g.cat+'"><span class="cm-rd"></span>'+g.n+'</div>'));
+  ps.forEach(p=>rows.push(rowHTML(p,p._fresh)));
+  gh.forEach(g=>rows.push('<div class="cm-row leaving cat-'+g.cat+(g.cat==='imp'?' is-imp':'')+'"><span class="cm-rd"></span>'+g.n+'</div>'));
   city.els.lbl.innerHTML=rows.join('');
-  city._sig=ps.map(p=>p.id).join(',')+'|'+gh.map(g=>g.n).join(',');
+  city._sig=ps.map(p=>p.id).join(',')+'|'+gh.map(g=>g.n).join(',')+'|'+
+    ps.filter(p=>isReigning(p,curYear)).map(p=>p.id).join('.');
 }
 
-/* --- ostacoli fissi: pannelli UI, barra, anno --- */
 function obstacleRects(){
   const rects=[];
   if(!document.body.classList.contains('theater')){
@@ -776,6 +950,17 @@ function birthFX(city,p){
     dot.appendChild(r);setTimeout(()=>r.remove(),2300);
   }
 }
+function reignRipple(city){
+  if(cities.get(city.key)!==city)return;
+  const dot=city.els.dot;
+  for(let i=0;i<3;i++){
+    const r=document.createElement('span');
+    r.className='rip big';
+    r.style.setProperty('--c','var(--reign)');
+    r.style.animationDelay=(i*0.2)+'s';
+    dot.appendChild(r);setTimeout(()=>r.remove(),2400);
+  }
+}
 function sparksAt(city,p){
   if(cities.get(city.key)!==city)return;
   const dot=city.els.dot,col=CATS[p.cat].color;
@@ -792,9 +977,11 @@ function sparksAt(city,p){
   dot.appendChild(x);setTimeout(()=>x.remove(),1400);
 }
 
-/* l'ultimo viaggio: cometa dalla città natale al luogo della morte */
+/* l'ultimo viaggio: ARCO se i luoghi differiscono,
+   CERCHIO TRATTEGGIATO se nasce e muore nello stesso luogo */
 function cityFX(city,p,done){
   const a=city.latlng,b=p.dla,col=CATS[p.cat].color;
+  const same=Math.hypot(a[0]-b[0],a[1]-b[1])<0.25;
   const fx={layers:[],raf:0,t4:null,dead:false,kill(){}};
   city.fx.push(fx);
   fx.kill=()=>{
@@ -803,7 +990,45 @@ function cityFX(city,p,done){
     fx.layers.forEach(l=>{try{map.removeLayer(l)}catch(_){}});
     city.fx=city.fx.filter(x=>x!==fx);
   };
-  if(Math.hypot(a[0]-b[0],a[1]-b[1])<0.25){fx.kill();done();return;}
+
+  if(same){
+    /* il viaggio di chi non è mai partito: un cerchio attorno a casa */
+    const pt=map.latLngToLayerPoint(a);
+    const R=26+city.R;
+    const N=72,pts=[];
+    for(let i=0;i<=N;i++){
+      const t=i/N*Math.PI*2-Math.PI/2;
+      pts.push(map.layerPointToLatLng(pt.add([Math.cos(t)*R,Math.sin(t)*R])));
+    }
+    const line=L.polyline([pts[0]],{color:col,weight:2,opacity:.9,dashArray:'3 7',
+      lineCap:'round',interactive:false}).addTo(map);
+    const comet=L.marker(pts[0],{interactive:false,zIndexOffset:800,
+      icon:L.divIcon({className:'cmhost',html:'<div class="comet" style="--c:'+col+'"></div>',iconSize:[0,0]})}).addTo(map);
+    fx.layers.push(line,comet);
+    const D=1500,t0=performance.now();
+    const step=now=>{
+      if(fx.dead)return;
+      const t=Math.min(1,(now-t0)/D);
+      const head=Math.max(1,Math.round(t*N));
+      line.setLatLngs(pts.slice(0,head+1));
+      comet.setLatLng(pts[head]);
+      if(t<1)fx.raf=requestAnimationFrame(step);else finish();
+    };
+    const finish=()=>{
+      if(fx.dead)return;
+      map.removeLayer(comet);
+      let o=.9;
+      fx.t4=setInterval(()=>{
+        o-=.15;
+        if(o<=0){fx.kill();done();}
+        else line.setStyle({opacity:o});
+      },100);
+    };
+    fx.raf=requestAnimationFrame(step);
+    return;
+  }
+
+  /* arco di viaggio (luoghi diversi) */
   const N=64,pts=[];
   const dist=Math.hypot(b[0]-a[0],b[1]-a[1]);
   const c=[(a[0]+b[0])/2+dist*0.18,(a[1]+b[1])/2];
@@ -903,7 +1128,8 @@ function updateWorld(Y,mode){
     if(next.length===0&&city.ghost.length===0&&city.fx.length===0&&city._pendingDeaths===0){
       removeCity(city,false);
     }else{
-      const sig=next.map(p=>p.id).join(',')+'|'+city.ghost.map(g=>g.n).join(',');
+      const sig=next.map(p=>p.id).join(',')+'|'+city.ghost.map(g=>g.n).join(',')+'|'+
+        next.filter(p=>isReigning(p,Y)).map(p=>p.id).join('.');
       if(sig!==city._sig)renderCityLabel(city);
     }
   }
@@ -917,26 +1143,47 @@ function updateWorld(Y,mode){
     }
   }
   layoutCities();
-  requestAnimationFrame(()=>{PEOPLE.forEach(p=>p._fresh=false);});
+  requestAnimationFrame(()=>{PEOPLE.forEach(p=>{p._fresh=false;p._crownFresh=false;});});
+}
+
+/* onda rossa quando un imperatore sale sul trono */
+function updateReignFX(prev,Y){
+  if(prev===null)return;
+  for(const p of PEOPLE){
+    if(p.r&&isReigning(p,Y)&&!isReigning(p,prev)){
+      const city=[...cities.values()].find(c=>c.people.includes(p));
+      if(city)setTimeout(()=>reignRipple(city),160);
+    }
+  }
+}
+
+/* ================== ANNUNCI ================== */
+function announce(e){
+  const p=e.p;
+  let ic,txt,yr;
+  if(e.t==='r'){
+    ic='<span class="a-ic">'+crownSVG(19)+'</span>';
+    txt='sale sul trono';
+    yr=fmtReign(p.r[0],p.r[1],true);
+  }else if(e.t==='b'){
+    ic='<span class="a-ic"><span class="a-dot" style="--ic:'+CATS[p.cat].color+';background:'+CATS[p.cat].color+'"></span></span>';
+    txt='nasce a '+p.bp;
+    yr=fmtY(p.b,p.bc);
+  }else{
+    ic='<span class="a-ic">\u2020</span>';
+    txt='muore a '+p.dp;
+    yr=p.dLab||fmtY(p.d,p.dc);
+  }
+  const el=document.createElement('div');
+  el.className='ann '+e.t;
+  el.innerHTML=ic+'<span class="a-n">'+p.n+'</span><span class="a-t">'+txt+'</span><span class="a-y">'+yr+'</span>';
+  annHost.appendChild(el);
+  while(annHost.children.length>4)annHost.firstChild.remove();
+  setTimeout(()=>el.classList.add('out'),2400);
+  setTimeout(()=>el.remove(),2900);
 }
 
 /* ================== HUD ================== */
-const $=id=>document.getElementById(id);
-const yNum=$('yNum'),yEra=$('yEra'),eraEl=$('eraName'),feedEl=$('feed'),evCount=$('evCount'),
-      aliveNum=$('aliveNum'),aliveList=$('aliveList'),tlcur=$('tlcursor'),cursLbl=$('cursLbl'),
-      tl=$('tl'),tlsvg=$('tlsvg'),tlHead=$('tlHead'),tip=$('tip'),
-      cardEl=$('card'),rightEl=$('right'),playBtn=$('playBtn'),
-      chap=$('chap'),chapN=$('chapN'),chapR=$('chapR'),
-      eName2=$('eName2'),eRange=$('eRange'),eTxt=$('eTxt'),eraInner=$('eraInner');
-let curYear=null,curEra='',cardP=null,lastFeedY=null,introActive=true,dragActive=false;
-
-let toastT=null;
-function toast(msg){
-  const t=$('toast');
-  t.textContent=msg;t.classList.add('show');
-  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);
-}
-
 function updateCursor(Y){
   const pct=yearToIdx(Y)/IDX_MAX;
   tlcur.style.left=(pct*100)+'%';
@@ -946,15 +1193,29 @@ function updateCursor(Y){
   cursLbl.classList.toggle('l',pct<0.05);
   if(fogRect){const x=pct*TLW;fogRect.setAttribute('x',x);fogRect.setAttribute('width',Math.max(0,TLW-x));}
 }
+function chipHTML(p){
+  if(p.cat==='imp'){
+    const on=isReigning(p,curYear);
+    return '<button class="chip cat-imp'+(on?' reigning':'')+'" data-p="'+p.id+'">'+
+      (on?crownSVG(12):'<span class="cd"></span>')+p.n+'</button>';
+  }
+  return '<button class="chip cat-'+p.cat+'" data-p="'+p.id+'"><span class="cd"></span>'+p.n+'</button>';
+}
 function renderAlive(Y){
   const alive=PEOPLE.filter(p=>Y>=p.b&&Y<p.d&&catOn[p.cat]).sort((a,b)=>a.b-b.b||a.id-b.id);
   aliveNum.textContent=alive.length;
   aliveList.innerHTML=alive.length
-    ?alive.map(p=>'<button class="chip cat-'+p.cat+'" data-p="'+p.id+'"><span class="cd"></span>'+p.n+'</button>').join('')
+    ?alive.map(chipHTML).join('')
     :'<div class="none">Nessuna vita in quest\u2019anno.</div>';
 }
 function evHTML(e,anim){
   const p=e.p;
+  if(e.t==='r'){
+    return '<button class="ev ev-r'+(anim?' new':'')+'" data-cat="imp" data-p="'+p.id+'">'+
+      '<span class="ev-i r">'+crownSVG(14)+'</span>'+
+      '<span class="ev-t"><b>'+p.n+'</b> sale sul trono</span>'+
+      '<span class="ev-y">'+fmtReign(p.r[0],p.r[1],true)+'</span></button>';
+  }
   const yTxt=e.t==='d'?(p.dLab||fmtY(p.d,p.dc)):fmtY(p.b,p.bc);
   const icon=e.t==='b'?'<span class="ev-i b"></span>':'<span class="ev-i d">\u2020</span>';
   const verb=e.t==='b'?'nasce a':'muore a';
@@ -962,17 +1223,31 @@ function evHTML(e,anim){
     '<span class="ev-t"><b>'+p.n+'</b> '+verb+' '+(e.t==='b'?p.bp:p.dp)+'</span>'+
     '<span class="ev-y">'+yTxt+'</span></button>';
 }
+function feedBlockHTML(evs,anim){
+  let html='',lastY=null;
+  for(const e of evs){
+    if(e.y!==lastY){
+      html+='<div class="ev-sep"><span>'+(e.y<0?(-e.y)+' a.C.':e.y+' d.C.')+'</span></div>';
+      lastY=e.y;
+    }
+    html+=evHTML(e,anim);
+  }
+  return html;
+}
 function updateFeed(Y,animate){
   const vis=EVENTS.filter(e=>e.y<=Y&&catOn[e.p.cat]);
   evCount.textContent=vis.length+' eventi';
-  const evs=vis.slice(-26);
+  const evs=vis.slice(-26).reverse();
   if(!animate||lastFeedY===null||Y<=lastFeedY||Y-lastFeedY>2){
-    feedEl.innerHTML=evs.slice().reverse().map(e=>evHTML(e,false)).join('');
+    feedEl.innerHTML=feedBlockHTML(evs,false);
   }else{
-    const fresh=EVENTS.filter(e=>e.y>lastFeedY&&e.y<=Y&&catOn[e.p.cat]);
+    const fresh=EVENTS.filter(e=>e.y>lastFeedY&&e.y<=Y&&catOn[e.p.cat]).reverse();
     if(fresh.length){
-      feedEl.insertAdjacentHTML('afterbegin',fresh.slice().reverse().map(e=>evHTML(e,true)).join(''));
-      while(feedEl.children.length>26)feedEl.lastElementChild.remove();
+      feedEl.insertAdjacentHTML('afterbegin',feedBlockHTML(fresh,true));
+      while(feedEl.querySelectorAll('.ev').length>26&&feedEl.children.length>1){
+        feedEl.removeChild(feedEl.lastElementChild);
+      }
+      if(feedEl.lastElementChild&&feedEl.lastElementChild.classList.contains('ev-sep'))feedEl.removeChild(feedEl.lastElementChild);
     }
   }
   lastFeedY=Y;
@@ -1009,8 +1284,28 @@ function setYear(Y){
   const mode=(playing||(fwd&&delta<=2&&!dragActive))?'anim':'seek';
   if(pe&&pe!==eraOf(Y)&&(playing||delta>6))showChapter(eraOf(Y));
   curYear=Y;yearF=Y;
+
+  /* incoronazioni: nome che cresce + flash rosso sull'anno */
+  let crowned=[];
+  if(prev!==null&&fwd&&delta<=4){
+    crowned=PEOPLE.filter(p=>p.r&&isReigning(p,Y)&&!isReigning(p,prev)&&catOn[p.cat]);
+    crowned.forEach(p=>p._crownFresh=true);
+  }
+
   updateWorld(Y,mode);
+  updateReignFX(prev,Y);
   updateHUD(Y,mode);
+
+  if(fwd&&delta<=4){
+    const evs=EVENTS.filter(e=>e.y>prev&&e.y<=Y&&catOn[e.p.cat]);
+    if(evs.length&&evs.length<=6)evs.forEach((e,i)=>setTimeout(()=>announce(e),i*170));
+    if(crowned.length){
+      setTimeout(()=>{
+        yearBoxEl.classList.remove('rf');void yearBoxEl.offsetWidth;yearBoxEl.classList.add('rf');
+        clearTimeout(rfT);rfT=setTimeout(()=>yearBoxEl.classList.remove('rf'),1600);
+      },140);
+    }
+  }
 }
 
 /* ================== TOOLTIP CITTÀ ================== */
@@ -1018,7 +1313,12 @@ function showCityTip(city,ev){
   const ps=city.people;
   if(!ps.length)return;
   tip.innerHTML='<b>'+ps[0].bp+'</b>'+
-    ps.map(p=>'<span class="ttr cat-'+p.cat+'">'+p.n+' · '+fmtY(p.b,p.bc)+'</span>').join('');
+    ps.map(p=>{
+      const on=isReigning(p,curYear);
+      const lead=(p.cat==='imp'&&on)?crownSVG(11):'';
+      return '<span class="ttr cat-'+p.cat+((p.cat==='imp'&&on)?' crowned goldrow':'')+'">'+lead+
+        p.n+' · '+fmtY(p.b,p.bc)+(p.r?' · imp. '+fmtReign(p.r[0],p.r[1],true):'')+'</span>';
+    }).join('');
   tip.style.display='block';moveTip(ev);
 }
 function moveTip(e){
@@ -1041,11 +1341,23 @@ function renderCard(){
       :'<span class="st dim">\u2020 Scomparso nel '+(p.dLab||fmtY(p.d,p.dc))+' · '+p.dp+'</span>');
   const X=y=>6+yearToIdx(y)/IDX_MAX*256;
   const cur=X(Y);
+  let regno='';
+  if(p.r){
+    const on=isReigning(p,Y);
+    const note=on?'in trono in quest\u2019anno'
+      :(Y<p.r[0]?'sale sul trono nel '+fmtY(p.r[0])
+      :(p.abd?'regno concluso · abdicazione nel '+fmtY(p.r[1]):'regno concluso nel '+fmtY(p.r[1])));
+    regno='<div class="c-block"><span class="c-lbl">REGNO</span>'+
+      '<div class="c-loc regn'+(on?' on':'')+'">'+(on?crownSVG(16):'')+fmtReign(p.r[0],p.r[1])+'</div>'+
+      '<div class="c-yr">'+note+'</div></div>';
+  }
+  const rseg=p.r?'<line x1="'+X(p.r[0])+'" y1="24" x2="'+X(Math.min(p.r[1],p.d))+'" y2="24" stroke="var(--reign)" stroke-width="5.5" stroke-linecap="round" opacity=".95"/>':'';
   cardEl.innerHTML=
    '<div class="card-head"><span class="card-cat" style="color:'+col+'">'+p.role.toUpperCase()+'</span>'+
      '<button class="card-x" id="cardX" title="Chiudi (Esc)">'+XS+'</button></div>'+
-   '<h2 class="card-name">'+p.n+'</h2>'+status+
+   '<h2 class="card-name">'+(isReigning(p,Y)?crownSVG(23):'')+p.n+'</h2>'+status+
    '<div class="card-age">in vita circa '+ageOf(p)+' anni</div>'+
+   regno+
    '<div class="c-block"><span class="c-lbl">NASCITA</span>'+
      '<div class="c-loc">'+p.bp+' <span class="c-yr">· '+fmtY(p.b,p.bc)+'</span></div>'+
      '<div class="c-yr">'+p.bla[0].toFixed(4)+' , '+p.bla[1].toFixed(4)+'</div>'+
@@ -1058,12 +1370,14 @@ function renderCard(){
      '<svg class="lf" viewBox="0 0 268 34" id="lfSvg">'+
        '<line x1="6" y1="24" x2="262" y2="24" class="lf-track"/>'+
        '<line x1="'+X(p.b)+'" y1="24" x2="'+X(p.d)+'" y2="24" stroke="'+col+'" stroke-width="3.5" stroke-linecap="round"/>'+
+       rseg+
        '<circle cx="'+X(p.b)+'" cy="24" r="3.4" fill="'+col+'"/>'+
        '<circle cx="'+X(p.d)+'" cy="24" r="3.4" fill="none" stroke="'+col+'" stroke-width="1.6"/>'+
        '<line x1="'+cur+'" y1="15" x2="'+cur+'" y2="31" stroke-width="1.3" class="lf-cur"/>'+
        '<text x="'+Math.min(256,Math.max(12,cur))+'" y="10" text-anchor="middle" class="lf-txt">'+
          (Y<0?(-Y)+' a.C.':Y+' d.C.')+'</text>'+
      '</svg>'+
+     (p.r?'<div class="lf-hint">la banda rossa è il periodo di regno</div>':'')+
      '<div class="lf-hint">clicca sulla linea per spostarti nel tempo</div></div>';
   cardEl.querySelector('#cardX').onclick=closeCard;
   cardEl.querySelector('#lfSvg').addEventListener('pointerdown',e=>{
@@ -1076,7 +1390,8 @@ function renderCard(){
 }
 function openCard(p){
   if(document.body.classList.contains('theater')){
-    toast(p.n+' · '+fmtY(p.b,p.bc)+' \u2013 '+(p.dLab||fmtY(p.d,p.dc))+' · premi M per i dettagli');
+    toast(p.n+' · '+fmtY(p.b,p.bc)+' \u2013 '+(p.dLab||fmtY(p.d,p.dc))+
+      (p.r?' · imperatore '+fmtReign(p.r[0],p.r[1],true):'')+' · premi M per i dettagli');
     return;
   }
   cardP=p;cardEl.classList.add('open');rightEl.style.display='none';renderCard();
@@ -1116,15 +1431,38 @@ function renderTL(){
     const hit=mk(x1,x2,'transparent',Math.max(8,rowH*3),['pointer-events','stroke']);
     const life=mk(x1,x2,CATS[p.cat].color,Math.max(1.6,rowH*.8),['stroke-linecap','round']);
     life.setAttribute('opacity','.92');
+    g.append(hit,life);
+    if(p.r){
+      const rx1=yearToIdx(p.r[0])/IDX_MAX*W;
+      const rx2=yearToIdx(Math.min(p.r[1],p.d))/IDX_MAX*W;
+      g.appendChild(mk(rx1,rx2,'var(--reign)',Math.max(2.2,rowH*1.05),['stroke-linecap','round']));
+    }
     const c=svgEl('circle');
     c.setAttribute('cx',x1);c.setAttribute('cy',y);c.setAttribute('r',Math.max(2.2,rowH*.62));
     c.setAttribute('fill',CATS[p.cat].color);
-    g.append(hit,life,c);
+    g.appendChild(c);
     g.addEventListener('pointerenter',e=>{if(!dragActive){tlsvg.classList.add('dim');showTip(p,e);}});
     g.addEventListener('pointermove',e=>{if(!dragActive)moveTip(e);});
     g.addEventListener('pointerleave',()=>{tlsvg.classList.remove('dim');tip.style.display='none';});
     tlsvg.appendChild(g);
   });
+  /* tacche eventi: rosso = incoronazioni */
+  const evYears=new Map();
+  EVENTS.forEach(e=>{
+    if(!catOn[e.p.cat])return;
+    const cur=evYears.get(e.y)||false;
+    evYears.set(e.y,cur||e.t==='r');
+  });
+  for(const [y,hasR] of evYears){
+    const t=svgEl('line');
+    const x=yearToIdx(y)/IDX_MAX*W;
+    t.setAttribute('x1',x);t.setAttribute('x2',x);
+    t.setAttribute('y1',0);t.setAttribute('y2',hasR?8:4);
+    t.setAttribute('stroke',hasR?'var(--reign)':'var(--ink-faint)');
+    t.setAttribute('stroke-width',hasR?1.6:1);
+    t.setAttribute('class','tick');
+    tlsvg.appendChild(t);
+  }
   fogRect=svgEl('rect');
   fogRect.setAttribute('y',0);fogRect.setAttribute('height',H);fogRect.setAttribute('class','fog');
   tlsvg.appendChild(fogRect);
@@ -1141,7 +1479,8 @@ function buildHead(){
   });
 }
 function showTip(p,e){
-  tip.innerHTML='<b>'+p.n+'</b><span>'+fmtY(p.b,p.bc)+' — '+(p.dLab||fmtY(p.d,p.dc))+' · '+p.role+'</span>';
+  tip.innerHTML='<b>'+p.n+'</b><span>'+fmtY(p.b,p.bc)+' — '+(p.dLab||fmtY(p.d,p.dc))+' · '+p.role+
+    (p.r?' · imperatore '+fmtReign(p.r[0],p.r[1],true):'')+'</span>';
   tip.style.display='block';moveTip(e);
 }
 
@@ -1170,9 +1509,11 @@ tl.addEventListener('pointerup',()=>{
 });
 tl.addEventListener('pointercancel',()=>{dragTL=null;dragActive=false;});
 
-/* ================== RIPRODUZIONE ================== */
-const SPEEDS=[2.5,7,18];
-let SPEED=7,playing=false,yearF=YEAR_MIN,lastT=0;
+/* ================== RIPRODUZIONE ==================
+   ¼× ≈ 0,9 anni/sec · ½× ≈ 1,6 (default: per seguire con calma)
+   1× ≈ 4,5 · 3× ≈ 13 — con rallentamento vicino agli eventi */
+const SPEEDS=[0.9,1.6,4.5,13];
+let SPEED=SPEEDS[1],playing=false,yearF=YEAR_MIN,lastT=0;
 const PLAY_S='<svg viewBox="0 0 24 24" width="17" height="17"><path d="M7.5 4.5v15l13-7.5z" fill="currentColor"/></svg>';
 const PAUSE_S='<svg viewBox="0 0 24 24" width="17" height="17"><path d="M6.5 4.5h3.6v15H6.5zM13.9 4.5h3.6v15h-3.6z" fill="currentColor"/></svg>';
 const REW_S='<svg viewBox="0 0 24 24" width="15" height="15"><path d="M5.5 4.5h2.6v15H5.5z" fill="currentColor"/><path d="M20 4.8v14.4L9.5 12z" fill="currentColor"/></svg>';
@@ -1234,14 +1575,8 @@ function setPalette(pal){
 }
 function setBasemap(id,announce){
   const bm=BASEMAPS.find(b=>b.id===id);if(!bm)return;
-  bmId=id;
-  const old=tileLayer;
-  fallArmed=false;errCount=0;usingFallback=false;
-  tileLayer=L.tileLayer(bm.url,{subdomains:bm.sub,maxZoom:19,attribution:bm.attr});
-  watchTiles(tileLayer);
-  tileLayer.addTo(map);
-  if(old)map.removeLayer(old);
-  document.documentElement.style.setProperty('--tile-filter',bm.filter);
+  bmId=id;fbStage=0;errCount=0;gaveUp=false;
+  applyTiles(bm,null);
   setPalette(bm.pal);
   try{localStorage.setItem('vr-basemap',id);}catch(_){}
   if(announce)toast('Mappa: '+bm.name);
@@ -1250,7 +1585,7 @@ baseBtn.onclick=()=>{
   const i=BASEMAPS.findIndex(b=>b.id===bmId);
   setBasemap(BASEMAPS[(i+1)%BASEMAPS.length].id,true);
 };
-themeBtn.onclick=()=>setBasemap(theme==='dark'?'light':'dark',false);
+themeBtn.onclick=()=>setBasemap(theme==='dark'?'perg':'notte',false);
 
 /* ================== SOLO MAPPA ================== */
 function toggleTheater(){
@@ -1293,13 +1628,13 @@ window.addEventListener('keydown',e=>{
   if(e.code==='Space'){e.preventDefault();togglePlay();}
   else if(e.key==='ArrowRight'){e.preventDefault();stopPlay();setYear(curYear===-1?1:curYear+1);}
   else if(e.key==='ArrowLeft'){e.preventDefault();stopPlay();setYear(curYear===1?-1:curYear-1);}
-  else if(e.key==='t'||e.key==='T'){setBasemap(theme==='dark'?'light':'dark',false);}
+  else if(e.key==='t'||e.key==='T'){setBasemap(theme==='dark'?'perg':'notte',false);}
   else if(e.key==='b'||e.key==='B'){baseBtn.click();}
   else if(e.key==='m'||e.key==='M'){toggleTheater();}
   else if(e.key==='Escape')closeCard();
 });
 
-/* ================== INTRO: diorama vivente ================== */
+/* ================== INTRO ================== */
 const DRIFT=[[[41.9,12.5],6.5],[[37.2,-5.4],5.5],[[45.4,10.6],5.5],[[39.5,20],5.5]];
 let driftTimer=null,driftI=0;
 function startDrift(){
@@ -1316,6 +1651,7 @@ function hideIntro(){
   if(driftTimer){clearInterval(driftTimer);driftTimer=null;}
   const iv=$('intro');iv.classList.add('hide');
   setTimeout(()=>iv.style.display='none',950);
+  map.invalidateSize();
 }
  $('startBtn').onclick=()=>{
   hideIntro();
@@ -1329,11 +1665,37 @@ function hideIntro(){
 };
 
 /* ================== AVVIO ================== */
+ $('fltNote').innerHTML=crownSVG(13)+
+ '<span>La <b>corona rossa</b> compare accanto al nome di un imperatore <b>solo durante gli anni del suo regno</b> — e in quel momento il nome diventa più grande.</span>';
+ $('legCrown').innerHTML=crownSVG(13)+' imperatore in trono';
 buildHead();renderTL();
 setYear(DIORAMA);
 startDrift();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>layoutCities());
 window.addEventListener('resize',()=>{renderTL();map.invalidateSize();layoutCities();});
+} /* fine boot */
+
+/* ================== CARICAMENTO ROBUSTO DI LEAFLET ================== */
+function showFatal(){
+  document.getElementById('intro').style.display='none';
+  document.getElementById('fatal').style.display='grid';
+}
+(function(){
+  if(typeof L!=='undefined'){boot();return;}
+  var urls=[
+    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+    'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+  ];
+  (function next(i){
+    if(i>=urls.length){showFatal();return;}
+    var s=document.createElement('script');
+    s.src=urls[i];
+    s.onload=function(){typeof L!=='undefined'?boot():next(i+1);};
+    s.onerror=function(){next(i+1);};
+    document.head.appendChild(s);
+  })(0);
+})();
 </script>
 </body>
 </html>
